@@ -1,11 +1,20 @@
 import { Case, Evidence, Finding, DashboardStats, Correlation, AuditLog, Report } from '../types';
 import { supabase } from '../lib/supabase';
 
-const getApiBase = (): string => {
-  const rawUrl = import.meta.env.VITE_API_URL;
+export const getApiBase = (): string => {
+  let rawUrl = import.meta.env.VITE_API_URL || '';
+
+  // Safety guard: if running in production browser on non-localhost domain, ignore localhost API URL
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    if (rawUrl.includes('localhost') || rawUrl.includes('127.0.0.1')) {
+      rawUrl = '';
+    }
+  }
+
   if (!rawUrl || rawUrl.trim() === '') {
     return '/api';
   }
+
   const cleanUrl = rawUrl.trim().replace(/\/+$/, '');
   return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
 };

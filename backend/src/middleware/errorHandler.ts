@@ -9,8 +9,8 @@ export function errorHandler(err: any, _req: Request, res: Response, _next: Next
   res.status(status).json({
     error: {
       message,
-      code: err.code || 'INTERNAL_ERROR',
-      details: err.details || null,
+      code: err.code || (status === 422 ? 'UNPROCESSABLE_ENTITY' : status === 400 ? 'VALIDATION_ERROR' : 'INTERNAL_ERROR'),
+      details: err.details || err.errors || null,
     },
   });
 }
