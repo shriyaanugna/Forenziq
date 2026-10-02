@@ -27,6 +27,22 @@ router.post('/', optionalAuth, async (req: AuthenticatedRequest, res: Response, 
     const caseIdString = generateCaseId();
     const investigatorId = req.user?.id || null;
 
+    if (investigatorId) {
+      // Ensure the investigator user record exists in public.users to satisfy cases_investigator_id_fkey
+      const userEmail = req.user?.email || `${investigatorId}@investigator.local`;
+      const userName = req.user?.name || investigator_name || 'Investigator';
+
+      const { error: userUpsertError } = await supabase.from('users').upsert({
+        id: investigatorId,
+        email: userEmail,
+        name: userName,
+      }, { onConflict: 'id' });
+
+      if (userUpsertError) {
+        console.warn('[CASE CREATION] Notice upserting investigator into users table:', userUpsertError.message);
+      }
+    }
+
     const { data: newCase, error } = await supabase
       .from('cases')
       .insert({
@@ -40,8 +56,21 @@ router.post('/', optionalAuth, async (req: AuthenticatedRequest, res: Response, 
       .select()
       .single();
 
-    if (error || !newCase) {
-      throw new Error(`Failed to create case in database: ${error?.message}`);
+    if (error) {
+      if (error.code === '23503' || error.message?.includes('foreign key constraint')) {
+        res.status(400).json({
+          error: {
+            message: 'Invalid investigator ID provided. The specified investigator record does not exist in the database.',
+            code: 'INVALID_INVESTIGATOR_REFERENCE',
+          },
+        });
+        return;
+      }
+      throw new Error(`Failed to create case in database: ${error.message}`);
+    }
+
+    if (!newCase) {
+      throw new Error('Failed to create case in database: No record returned.');
     }
 
     // Log chain-of-custody audit event

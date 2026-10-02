@@ -41,12 +41,12 @@ router.post('/signup', async (req, res) => {
     }
 
     if (data.user) {
-      // Ensure user entry in users table if needed
+      // Ensure user entry in public.users table
       await supabase.from('users').upsert({
         id: data.user.id,
         email: data.user.email,
         name: name || data.user.email?.split('@')[0],
-      });
+      }, { onConflict: 'id' });
     }
 
     return res.status(201).json({
@@ -88,6 +88,15 @@ router.post('/login', async (req, res) => {
         error: 'Authentication Failed',
         message: 'Invalid email address or password.',
       });
+    }
+
+    if (data.user) {
+      // Ensure user entry in public.users table upon login
+      await supabase.from('users').upsert({
+        id: data.user.id,
+        email: data.user.email || email,
+        name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'Investigator',
+      }, { onConflict: 'id' });
     }
 
     return res.status(200).json({
