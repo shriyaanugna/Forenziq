@@ -96,7 +96,22 @@ router.get('/reports/:reportId', async (req: Request, res: Response, next: NextF
 
     // Check if download requested via query string ?download=true
     if (req.query.download === 'true') {
-      const { data: fileData, error: dlErr } = await supabase.storage.from('reports').download(report.storage_path);
+      let fileData: Blob | null = null;
+      let { data, error: dlErr } = await supabase.storage.from('reports').download(report.storage_path);
+
+      if ((dlErr || !data) && report.case_id) {
+        // Fallback: regenerate report if missing from storage bucket
+        try {
+          const regenerated = await ReportService.generateCaseReport(report.case_id);
+          const dlRes = await supabase.storage.from('reports').download(regenerated.storage_path);
+          data = dlRes.data;
+          dlErr = dlRes.error;
+        } catch {
+          // Ignore fallback failure
+        }
+      }
+
+      fileData = data;
 
       if (dlErr || !fileData) {
         res.status(404).json({ error: { message: 'Report PDF file not found in storage.' } });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FileText, Download } from 'lucide-react';
-import { fetchAllReports } from '../services/api';
+import { fetchAllReports, getReportDownloadUrl } from '../services/api';
 import { Report } from '../types';
 
 export default function ReportsPage() {
@@ -52,7 +52,7 @@ export default function ReportsPage() {
               </div>
 
               <a
-                href={`/api/reports/${rpt.report_id}?download=true`}
+                href={getReportDownloadUrl(rpt.report_id)}
                 target="_blank"
                 rel="noreferrer"
                 className="astra-btn-primary text-xs"

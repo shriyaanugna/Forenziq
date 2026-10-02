@@ -11,6 +11,7 @@ import {
   analyzeEvidence,
   triggerCorrelationScan,
   generateReport,
+  getReportDownloadUrl,
 } from '../services/api';
 import { Case, Evidence, Finding, Correlation, AuditLog, Report } from '../types';
 import InvestigationGraph from '../components/InvestigationGraph';
@@ -575,7 +576,7 @@ export default function CaseWorkspacePage() {
                   </div>
 
                   <a
-                    href={`/api/reports/${rpt.report_id}?download=true`}
+                    href={getReportDownloadUrl(rpt.report_id)}
                     target="_blank"
                     rel="noreferrer"
                     className="astra-btn-primary text-xs"

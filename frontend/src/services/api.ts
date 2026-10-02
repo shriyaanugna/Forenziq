@@ -32,6 +32,10 @@ export const getApiBase = (): string => {
 
 const API_BASE = getApiBase();
 
+export function getReportDownloadUrl(reportId: string): string {
+  return `${getApiBase()}/reports/${reportId}?download=true`;
+}
+
 async function getAuthHeaders(customHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
   const headers: Record<string, string> = { ...customHeaders };
