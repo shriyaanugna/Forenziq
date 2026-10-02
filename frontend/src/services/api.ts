@@ -1,7 +1,16 @@
 import { Case, Evidence, Finding, DashboardStats, Correlation, AuditLog, Report } from '../types';
 import { supabase } from '../lib/supabase';
 
-const API_BASE = '/api';
+const getApiBase = (): string => {
+  const rawUrl = import.meta.env.VITE_API_URL;
+  if (!rawUrl || rawUrl.trim() === '') {
+    return '/api';
+  }
+  const cleanUrl = rawUrl.trim().replace(/\/+$/, '');
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+};
+
+const API_BASE = getApiBase();
 
 async function getAuthHeaders(customHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();

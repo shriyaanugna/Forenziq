@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Lock, Mail, User, Eye, EyeOff, AlertCircle, Check, ArrowRight } from 'lucide-react';
+import { Shield, Lock, Mail, User, Eye, EyeOff, AlertCircle, Check, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -10,6 +10,7 @@ export const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const { signup } = useAuth();
@@ -22,6 +23,7 @@ export const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
 
     if (!email || !password || !name) {
       setError('Please fill in all required fields.');
@@ -44,6 +46,8 @@ export const RegisterPage: React.FC = () => {
 
     if (res.error) {
       setError(res.error);
+    } else if (res.info) {
+      setInfo(res.info);
     } else {
       navigate('/dashboard');
     }
@@ -73,6 +77,13 @@ export const RegisterPage: React.FC = () => {
           <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-3">
             <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <span>{error}</span>
+          </div>
+        )}
+
+        {info && (
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-3">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+            <span>{info}</span>
           </div>
         )}
 

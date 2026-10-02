@@ -73,7 +73,7 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
@@ -262,11 +262,11 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
     // E. ANIMATION LOOP
     // ==========================================
     let animationFrameId: number;
-    const clock = new THREE.Clock();
+    const startTime = performance.now();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
 
       // Gentle vertical floating motion
       lockGroup.position.y = -0.1 + Math.sin(elapsedTime * 1.4) * 0.24;

@@ -12,40 +12,19 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
-  signup: (email: string, password: string, name?: string) => Promise<{ error?: string }>;
+  signup: (email: string, password: string, name?: string) => Promise<{ error?: string; info?: string }>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const savedMock = localStorage.getItem('forenziq_mock_user');
-    if (savedMock) {
-      try {
-        return JSON.parse(savedMock);
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  });
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const mockSaved = localStorage.getItem('forenziq_mock_user');
-    if (mockSaved) {
-      try {
-        const parsed = JSON.parse(mockSaved);
-        setUser(parsed);
-        setIsLoading(false);
-      } catch {
-        // proceed
-      }
-    }
-
-    // Check initial session
+    // Check initial session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser({
@@ -54,7 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
         });
         setToken(session.access_token);
+      } else {
+        setUser(null);
+        setToken(null);
       }
+      setIsLoading(false);
+    }).catch(() => {
       setIsLoading(false);
     });
 
@@ -67,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
         });
         setToken(session.access_token);
-      } else if (!localStorage.getItem('forenziq_mock_user')) {
+      } else {
         setUser(null);
         setToken(null);
       }
@@ -83,28 +67,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        // Dev fallback for offline verification testing
-        const mockObj = {
-          id: '11111111-1111-1111-1111-111111111111',
-          email: email,
-          name: email.split('@')[0],
-        };
-        localStorage.setItem('forenziq_mock_user', JSON.stringify(mockObj));
-        setUser(mockObj);
-        return {};
+        return { error: error.message || 'Invalid email or password.' };
       }
 
-      if (data.user) {
+      if (data.user && data.session) {
         setUser({
           id: data.user.id,
           email: data.user.email || '',
           name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0],
         });
-        setToken(data.session?.access_token || null);
+        setToken(data.session.access_token);
+        return {};
       }
-      return {};
+
+      return { error: 'Authentication failed. Please check your credentials.' };
     } catch (err: any) {
-      return { error: err.message || 'Login failed' };
+      return { error: err.message || 'Login failed.' };
     }
   };
 
@@ -121,33 +99,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        const mockObj = {
-          id: '11111111-1111-1111-1111-111111111111',
-          email: email,
-          name: name || email.split('@')[0],
-        };
-        localStorage.setItem('forenziq_mock_user', JSON.stringify(mockObj));
-        setUser(mockObj);
-        return {};
+        return { error: error.message || 'Sign up failed.' };
       }
 
       if (data.user) {
-        setUser({
-          id: data.user.id,
-          email: data.user.email || '',
-          name: data.user.user_metadata?.full_name || name || data.user.email?.split('@')[0],
-        });
-        if (data.session) setToken(data.session.access_token);
+        if (data.session) {
+          setUser({
+            id: data.user.id,
+            email: data.user.email || '',
+            name: data.user.user_metadata?.full_name || name || data.user.email?.split('@')[0],
+          });
+          setToken(data.session.access_token);
+          return {};
+        } else {
+          return { info: 'Account created! Please check your email to confirm your account before logging in.' };
+        }
       }
-      return {};
+
+      return { error: 'Unable to create user account.' };
     } catch (err: any) {
-      return { error: err.message || 'Registration failed' };
+      return { error: err.message || 'Registration failed.' };
     }
   };
 
   const logout = async () => {
-    localStorage.removeItem('forenziq_mock_user');
-    await supabase.auth.signOut();
+    await supabase.auth.signOut().catch(() => {});
     setUser(null);
     setToken(null);
   };
