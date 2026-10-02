@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { error: 'Invalid email address or password. Please check your credentials.' };
         }
         if (errMsg.toLowerCase().includes('email not confirmed')) {
-          return { error: 'Email address not confirmed. Please check your inbox for the confirmation link.' };
+          return { error: 'Email address not confirmed. To allow instant login, disable "Confirm email" in Supabase Dashboard (Authentication -> Providers -> Email).' };
         }
         return { error: error.message || 'Invalid email or password.' };
       }
@@ -117,7 +117,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (isRateLimit) {
           return {
-            error: 'Email rate limit exceeded. Supabase limits sign-up confirmation emails on default settings. Please wait a few minutes before trying again, or log in if your account is already created.'
+            error: 'Email rate limit exceeded. To enable instant account creation without rate limits, disable "Confirm email" in Supabase Dashboard (Authentication -> Providers -> Email).'
+          };
+        }
+
+        if (errMsg.toLowerCase().includes('already registered') || errMsg.toLowerCase().includes('user_already_exists')) {
+          return {
+            error: 'An investigator account with this email address already exists. Please sign in instead.'
           };
         }
 
@@ -126,6 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (data.user) {
         if (data.session) {
+          // Instant authenticated session established
           setUser({
             id: data.user.id,
             email: data.user.email || '',
@@ -134,7 +141,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setToken(data.session.access_token);
           return {};
         } else {
-          return { info: 'Account created! Please check your email to confirm your account before logging in.' };
+          // Account created but email confirmation is active in Supabase project settings
+          return {
+            info: 'Account created! To allow instant workspace access without confirmation links, disable "Confirm email" in Supabase Dashboard (Authentication -> Providers -> Email).'
+          };
         }
       }
 
@@ -143,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const errMsg = err?.message || '';
       if (err?.status === 429 || errMsg.toLowerCase().includes('rate limit')) {
         return {
-          error: 'Email rate limit exceeded. Please wait a few minutes before trying again.'
+          error: 'Email rate limit exceeded. Please wait a few minutes or disable "Confirm email" in Supabase Dashboard.'
         };
       }
       return { error: errMsg || 'Registration failed.' };
