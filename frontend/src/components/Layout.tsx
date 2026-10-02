@@ -1,5 +1,6 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   FolderLock,
@@ -9,10 +10,20 @@ import {
   FileText,
   Settings,
   ShieldCheck,
-  Globe
+  Globe,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
 
 export default function Layout() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
   const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/cases', label: 'Cases', icon: FolderLock },
@@ -26,7 +37,7 @@ export default function Layout() {
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between">
+      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
         <div>
           <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
             <ShieldCheck className="w-8 h-8 text-cyan-400" />
@@ -72,9 +83,33 @@ export default function Layout() {
           </nav>
         </div>
 
-        <div className="p-4 border-t border-slate-800 text-xs text-slate-500">
-          <p className="font-semibold text-slate-400">Phase 1 & Phase 2 Engine Active</p>
-          <p className="mt-0.5 font-mono">v1.4.0 — Supabase DB</p>
+        {/* User Footer Account Info */}
+        <div className="p-4 border-t border-slate-800 space-y-3">
+          {user && (
+            <div className="flex items-center justify-between bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                  <UserIcon className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden text-xs">
+                  <p className="font-bold text-slate-100 truncate">{user.name || 'Investigator'}</p>
+                  <p className="text-[10px] text-slate-400 font-mono truncate">{user.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-1.5 rounded-lg hover:bg-rose-950/50 text-slate-400 hover:text-rose-400 transition-colors shrink-0"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <div className="text-[10px] text-slate-500 font-mono">
+            <span>FORENZIQ Security Engine</span>
+            <span className="block text-slate-600">Authenticated Session</span>
+          </div>
         </div>
       </aside>
 

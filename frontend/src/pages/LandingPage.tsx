@@ -1,31 +1,27 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   ShieldAlert,
   ArrowRight,
   Cpu,
   FileCheck2,
   Lock,
-  Search,
-  Zap,
   GitMerge,
-  FileText,
   Image as ImageIcon,
   MessageSquare,
   Layers,
   ChevronRight,
   Database,
-  CheckCircle2,
-  Sparkles
+  Sparkles,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
 import Forensic3DHero from '../components/Forensic3DHero';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-
-  const handleLaunchDashboard = () => {
-    navigate('/dashboard');
-  };
+  const { user, logout } = useAuth();
 
   const scrollToHowItWorks = () => {
     const el = document.getElementById('how-it-works');
@@ -55,7 +51,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
 
           {/* Logo & Brand */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-cyan-500/20 border border-cyan-400/30">
               <ShieldAlert className="w-5 h-5 text-white" />
             </div>
@@ -63,7 +59,7 @@ export default function LandingPage() {
               <span className="text-xl font-bold tracking-wider text-white font-mono">FORENZIQ</span>
               <p className="text-[10px] text-cyan-400 tracking-wider font-mono">AUTOMATED DIGITAL FORENSICS</p>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
@@ -73,14 +69,43 @@ export default function LandingPage() {
             <a href="#preview" className="hover:text-cyan-400 transition-colors">Workspace Preview</a>
           </nav>
 
-          {/* Action Button */}
-          <button
-            onClick={handleLaunchDashboard}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-semibold text-sm shadow-lg shadow-cyan-500/25 border border-cyan-300/30 flex items-center space-x-2 transition-all transform hover:-translate-y-0.5 cursor-pointer"
-          >
-            <span>Launch Dashboard</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          {/* Action Authentication Buttons */}
+          <div className="flex items-center space-x-3">
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/dashboard"
+                  className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 transition-all shadow-lg shadow-cyan-950/50"
+                >
+                  <UserIcon className="w-3.5 h-3.5" />
+                  <span>Dashboard ({user.name || user.email.split('@')[0]})</span>
+                </Link>
+                <button
+                  onClick={() => logout()}
+                  className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-rose-400 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-medium text-xs border border-slate-800 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/20 border border-cyan-300/30 flex items-center space-x-1.5 transition-all transform hover:-translate-y-0.5"
+                >
+                  <span>Sign Up</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
+          </div>
 
         </div>
       </header>
@@ -108,17 +133,26 @@ export default function LandingPage() {
 
             {/* Action Buttons */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              <button
-                onClick={handleLaunchDashboard}
-                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm shadow-xl shadow-cyan-500/20 border border-cyan-300/30 flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+              <Link
+                to={user ? "/dashboard" : "/register"}
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-xl shadow-cyan-500/20 border border-cyan-300/30 flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-0.5"
               >
-                <span>Explore Dashboard</span>
+                <span>{user ? "Go to Dashboard" : "Get Started"}</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
+
+              {!user && (
+                <Link
+                  to="/login"
+                  className="px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white font-medium text-sm border border-slate-800 flex items-center justify-center space-x-2 transition-all"
+                >
+                  <span>Sign In to Account</span>
+                </Link>
+              )}
 
               <button
                 onClick={scrollToHowItWorks}
-                className="px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white font-medium text-sm border border-slate-800 flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="px-6 py-3.5 rounded-xl bg-slate-900/40 hover:bg-slate-800 text-slate-400 hover:text-slate-200 font-medium text-sm border border-slate-800/60 flex items-center justify-center space-x-2 transition-all cursor-pointer"
               >
                 <span>Discover How It Works</span>
               </button>
@@ -342,13 +376,13 @@ export default function LandingPage() {
                 <h3 className="text-xl font-bold text-white mt-1">Operation DarkVault Extortion Investigation</h3>
               </div>
 
-              <button
-                onClick={handleLaunchDashboard}
+              <Link
+                to="/dashboard"
                 className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs flex items-center space-x-2 transition-all cursor-pointer"
               >
                 <span>Open Workspace</span>
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs font-mono">
@@ -395,13 +429,13 @@ export default function LandingPage() {
         </p>
 
         <div className="pt-2">
-          <button
-            onClick={handleLaunchDashboard}
-            className="px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-base shadow-2xl shadow-cyan-500/30 border border-cyan-300/40 inline-flex items-center space-x-3 transition-all transform hover:-translate-y-1 cursor-pointer"
+          <Link
+            to={user ? "/dashboard" : "/register"}
+            className="px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-base shadow-2xl shadow-cyan-500/30 border border-cyan-300/40 inline-flex items-center space-x-3 transition-all transform hover:-translate-y-1"
           >
-            <span>Launch FORENZIQ Dashboard</span>
+            <span>{user ? "Launch FORENZIQ Dashboard" : "Get Started Now"}</span>
             <ArrowRight className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
       </section>
 

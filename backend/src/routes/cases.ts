@@ -1,7 +1,8 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { supabase } from '../utils/supabaseClient.js';
 import { generateCaseId } from '../utils/idGenerator.js';
 import { AuditService } from '../services/auditService.js';
+import { optionalAuth, AuthenticatedRequest } from '../middleware/auth.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -14,7 +15,7 @@ const createCaseSchema = z.object({
 });
 
 // POST /api/cases - Create new forensic case
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/', optionalAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const parseResult = createCaseSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -24,6 +25,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
     const { title, description, investigator_name, metadata } = parseResult.data;
     const caseIdString = generateCaseId();
+    const investigatorId = req.user?.id || null;
 
     const { data: newCase, error } = await supabase
       .from('cases')
@@ -31,8 +33,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         case_id: caseIdString,
         title,
         description,
+        investigator_id: investigatorId,
         status: 'OPEN',
-        metadata: { ...metadata, investigator_name },
+        metadata: { ...metadata, investigator_name: req.user?.name || investigator_name },
       })
       .select()
       .single();
@@ -45,8 +48,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     await AuditService.logEvent({
       caseId: newCase.id,
       eventType: 'CASE_CREATED',
-      description: `Forensic case ${caseIdString} '${title}' initialized by ${investigator_name}.`,
-      metadata: { case_id: caseIdString, investigator: investigator_name },
+      actorUserId: investigatorId || undefined,
+      description: `Forensic case ${caseIdString} '${title}' initialized by ${req.user?.name || investigator_name}.`,
+      metadata: { case_id: caseIdString, investigator: req.user?.name || investigator_name },
     });
 
     res.status(201).json({ data: newCase });
@@ -56,7 +60,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // GET /api/cases - List all cases
-router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
+router.get('/', optionalAuth, async (_req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { data: cases, error } = await supabase
       .from('cases')
@@ -74,7 +78,7 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
 });
 
 // GET /api/cases/:caseId - Get single case details with stats
-router.get('/:caseId', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/:caseId', optionalAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const caseIdParam = Array.isArray(req.params.caseId) ? req.params.caseId[0] : req.params.caseId;
 

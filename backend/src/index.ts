@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+import authRouter from './routes/auth.js';
 import casesRouter from './routes/cases.js';
 import evidenceRouter from './routes/evidence.js';
 import findingsRouter from './routes/findings.js';
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRouter);
 app.use('/api/cases', casesRouter);
 app.use('/api/cases', evidenceRouter);
 app.use('/api/cases', correlationsRouter);
