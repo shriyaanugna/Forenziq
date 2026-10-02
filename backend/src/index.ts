@@ -15,7 +15,8 @@ import { errorHandler } from './middleware/errorHandler.js';
 dotenv.config();
 
 export const app = express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT) || 3001;
+const host = '0.0.0.0';
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || true,
@@ -36,16 +37,20 @@ app.use('/api', findingsRouter);
 app.use('/api', reportsRouter);
 app.use('/api/dashboard', dashboardRouter);
 
-// Health check
+// Health check endpoint for Render health monitoring
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    service: 'forenziq-backend',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Central error handler
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => {
-    console.log(`FORENZIQ Backend Server running on port ${port}`);
+  app.listen(port, host, () => {
+    console.log(`FORENZIQ Backend Server listening on http://${host}:${port}`);
   });
 }
