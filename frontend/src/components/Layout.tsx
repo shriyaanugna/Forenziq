@@ -9,11 +9,12 @@ import {
   FileText,
   Settings,
   ShieldCheck,
+  Globe
 } from 'lucide-react';
 
 export default function Layout() {
   const navItems = [
-    { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/cases', label: 'Cases', icon: FolderLock },
     { to: '/cases/new', label: 'New Case', icon: PlusCircle },
     { to: '/images', label: 'Image Vault', icon: ImageIcon },
@@ -38,13 +39,23 @@ export default function Layout() {
           </div>
 
           <nav className="p-4 space-y-1">
+            <NavLink
+              to="/"
+              className="flex items-center gap-3 px-4 py-2.5 mb-2 rounded-lg text-sm font-medium text-slate-400 hover:text-cyan-400 hover:bg-slate-800/60 border border-transparent hover:border-slate-800 transition-colors"
+            >
+              <Globe className="w-4 h-4 text-cyan-400" />
+              <span>Landing Page</span>
+            </NavLink>
+
+            <div className="h-px bg-slate-800 my-2" />
+
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  end={item.to === '/'}
+                  end={item.to === '/dashboard'}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
@@ -62,8 +73,8 @@ export default function Layout() {
         </div>
 
         <div className="p-4 border-t border-slate-800 text-xs text-slate-500">
-          <p className="font-semibold text-slate-400">Phase 1 Engine Active</p>
-          <p className="mt-0.5 font-mono">v1.0.0 — Supabase DB</p>
+          <p className="font-semibold text-slate-400">Phase 1 & Phase 2 Engine Active</p>
+          <p className="mt-0.5 font-mono">v1.4.0 — Supabase DB</p>
         </div>
       </aside>
 
