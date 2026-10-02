@@ -20,10 +20,11 @@
 - [5. System Architecture](#5-system-architecture)
 - [6. Directory Structure](#6-directory-structure)
 - [7. Installation & Setup](#7-installation--setup)
-- [8. Application Workflow](#8-application-workflow)
-- [9. Security & Privacy Controls](#9-security--privacy-controls)
-- [10. Limitations & Future Roadmap](#10-limitations--future-roadmap)
-- [11. Contributing & License](#11-contributing--license)
+- [8. Deployment Configuration (Render & Cloud)](#8-deployment-configuration-render--cloud)
+- [9. Application Workflow](#9-application-workflow)
+- [10. Security & Privacy Controls](#10-security--privacy-controls)
+- [11. Limitations & Future Roadmap](#11-limitations--future-roadmap)
+- [12. Contributing & License](#12-contributing--license)
 
 ---
 
@@ -48,12 +49,12 @@ In digital forensics and incident response (DFIR), investigators analyze hundred
 The platform features an entry landing page at `/` designed with a dark, cinematic cybersecurity aesthetic (`#06090e` obsidian base, `#0d121c` glass cards, deep cyan `#06b6d4` highlights, rose `#f43f5e` threat indicators, and emerald `#10b981` status accents).
 
 ### Features of the Landing Page:
-- **Cinematic 3D WebGL Canvas (`Forensic3DHero.tsx`):** Built with Three.js, featuring an orbiting wireframe forensic core (octahedron and icosahedron), scanning laser beam animations, satellite evidence nodes, and a ambient floating particle matrix. Includes WebGL support auto-detection and a static fallback card.
+- **Cinematic 3D WebGL Canvas (`Lock3DHero.tsx` / `Forensic3DHero.tsx`):** Built with Three.js, featuring an extruded 3D security lock with royal blue shackle, illuminated keyhole, studio lighting with `THREE.PCFShadowMap`, `performance.now()` time tracking, and smooth hovering/rotation animation. Includes WebGL support auto-detection and a static fallback card.
 - **Split-Screen Editorial Design:** Hero headline (*"Every digital trace tells a story."*), supporting technical description, product metric counters, and floating live workspace preview card.
 - **Workflow Pipeline:** Step-by-step visual workflow (*1. Collect Evidence → 2. Analyze & Investigate → 3. Generate Reports*).
 - **Capability Cards:** Detailed feature cards covering Image/Vision Forensics, Chat Intelligence, Multi-AI Fallback, Deterministic Severity, Cross-Evidence Correlation, and Chain of Custody Audit.
 - **Interactive Workspace Preview:** Real UI card preview showing active case metrics, critical finding highlights, and cryptographic hash verification.
-- **Seamless Navigation:** Prominent **"Launch Dashboard"** and **"Explore Dashboard"** CTAs routing directly to the investigation workspace at `/dashboard`.
+- **Seamless Navigation:** Smooth scrolling navbar links (`#hero`, `#how-it-works`, `#capabilities`, `#preview`) with active section state tracking and CTA routing directly to `/dashboard`.
 
 ---
 
@@ -124,21 +125,22 @@ The platform features an entry landing page at `/` designed with a dark, cinemat
 ```
 /
 ├── frontend/                     # React + Vite + TypeScript Frontend
+│   ├── public/                   # Static assets (favicon.svg, _redirects)
 │   ├── src/
-│   │   ├── components/           # Layout, Forensic3DHero, InvestigationGraph
-│   │   ├── pages/                # LandingPage, Dashboard, Cases, CaseWorkspace, Vaults, Reports
-│   │   ├── services/             # Axios REST API Client
+│   │   ├── components/           # Layout, Lock3DHero, InvestigationGraph
+│   │   ├── pages/                # LandingPage, Dashboard, Cases, CaseWorkspace, Vaults, Reports, Auth
+│   │   ├── services/             # Axios REST API Client (getApiBase)
 │   │   ├── types/                # Shared Frontend Types
 │   │   └── App.tsx               # React Router Definition
 │   └── package.json
 │
 ├── backend/                      # Express + TypeScript REST Backend
 │   ├── src/
-│   │   ├── routes/               # API Endpoints (cases, evidence, findings, correlations, audit, reports)
+│   │   ├── routes/               # API Endpoints (cases, evidence, findings, correlations, audit, reports, auth, dashboard)
 │   │   ├── services/             # AIService, SeverityEngine, CorrelationEngine, ReportGenerator, AuditService
 │   │   ├── utils/                # idGenerator, hashUtils, entityNormalizer, supabaseClient
-│   │   ├── middleware/           # errorHandler, uploadMiddleware
-│   │   └── index.ts              # Express Server Entrypoint
+│   │   ├── middleware/           # errorHandler, uploadMiddleware, auth
+│   │   └── index.ts              # Express Server Entrypoint (0.0.0.0:${PORT})
 │   └── package.json
 │
 ├── supabase/
@@ -146,6 +148,7 @@ The platform features an entry landing page at `/` designed with a dark, cinemat
 │       ├── 20250222000000_initial_schema.sql
 │       └── 20250222000001_phase2_schema.sql
 │
+├── render.yaml                   # Infrastructure as Code for Render Deployment
 ├── README.md
 └── .env.example
 ```
@@ -210,7 +213,53 @@ npm run build           # Build production artifacts for frontend and backend
 
 ---
 
-## 8. APPLICATION WORKFLOW
+## 8. DEPLOYMENT CONFIGURATION (RENDER & CLOUD)
+
+FORENZIQ includes a production-tested `render.yaml` specification for zero-downtime deployment on Render.
+
+### 1. Backend Web Service Settings (`forenziq-backend`)
+- **Environment:** Node
+- **Root Directory:** `.` (Repository Root)
+- **Build Command:** `npm run build --workspace=backend`
+- **Start Command:** `npm run start --workspace=backend` (Executes `node dist/index.js`)
+- **Host Binding:** `0.0.0.0`
+- **Port:** Configured via `PORT` env var (Render assigns dynamically)
+- **Health Check Path:** `/api/health`
+
+#### Required Backend Environment Variables:
+```env
+PORT=3001
+NODE_ENV=production
+SUPABASE_URL=https://your-supabase-id.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key
+GROQ_API_KEY=your_groq_key
+GEMINI_API_KEY=your_gemini_key
+CEREBRAS_API_KEY=your_cerebras_key
+OPENROUTER_API_KEY=your_openrouter_key
+```
+
+### 2. Frontend Static Site Settings (`forenziq-frontend`)
+- **Environment:** Static Site
+- **Build Command:** `npm run build --workspace=frontend`
+- **Publish Directory:** `./frontend/dist`
+- **SPA Route Rewrites:** `/* -> /index.html` (Handled via `render.yaml` and `frontend/public/_redirects`)
+
+#### Required Frontend Environment Variables:
+```env
+VITE_SUPABASE_URL=https://your-supabase-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_API_URL=https://forenziq-backend.onrender.com
+```
+
+### 3. Supabase Auth Configuration
+To allow new investigators to register and access the platform immediately without waiting for confirmation emails:
+1. Navigate to **Supabase Dashboard → Authentication → Providers → Email**.
+2. Toggle **Confirm email** to **OFF**.
+3. Save changes.
+
+---
+
+## 9. APPLICATION WORKFLOW
 
 1. **Landing Page (`/`):** View platform introduction, interact with the Three.js 3D WebGL hero, explore capabilities, and click **"Launch Dashboard"**.
 2. **Dashboard (`/dashboard`):** Review platform-wide metrics (Total Cases, Active Cases, Evidence Items, Critical Findings, Correlations, PDF Reports).
@@ -223,7 +272,7 @@ npm run build           # Build production artifacts for frontend and backend
 
 ---
 
-## 9. SECURITY & PRIVACY CONTROLS
+## 10. SECURITY & PRIVACY CONTROLS
 
 - **API Secrets Protection:** AI provider keys (`GROQ_API_KEY`, `GEMINI_API_KEY`, etc.) reside strictly on the Node.js backend and are never exposed to client bundles.
 - **Evidence Integrity:** SHA-256 hashes are computed server-side prior to storage to guarantee anti-tampering verification.
@@ -233,7 +282,7 @@ npm run build           # Build production artifacts for frontend and backend
 
 ---
 
-## 10. LIMITATIONS & FUTURE ROADMAP
+## 11. LIMITATIONS & FUTURE ROADMAP
 
 ### Current Phase 1 & 2 Capabilities:
 - Single & multi-source evidence ingestion (Images & Chats).
@@ -250,7 +299,7 @@ npm run build           # Build production artifacts for frontend and backend
 
 ---
 
-## 11. CONTRIBUTING & LICENSE
+## 12. CONTRIBUTING & LICENSE
 
 Contributions are welcome! Please follow these steps:
 1. Fork the repository.
