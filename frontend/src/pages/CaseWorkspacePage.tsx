@@ -127,7 +127,7 @@ export default function CaseWorkspacePage() {
   const handleTriggerAnalysis = async (evidenceId: string) => {
     setAnalyzingIds((prev) => ({ ...prev, [evidenceId]: true }));
     try {
-      await analyzeEvidence(evidenceId);
+      await analyzeEvidence(evidenceId, caseId);
       await loadData();
     } catch (err: any) {
       alert(`AI Analysis Failed: ${err.message}`);

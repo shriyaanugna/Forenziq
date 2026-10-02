@@ -119,9 +119,13 @@ export async function uploadEvidence(caseId: string, formData: FormData): Promis
   return json.data;
 }
 
-export async function analyzeEvidence(evidenceId: string): Promise<{ finding: Finding; evidence_status: string }> {
+export async function analyzeEvidence(evidenceId: string, caseId?: string): Promise<{ finding: Finding; evidence_status: string }> {
   const headers = await getAuthHeaders();
-  const res = await fetch(`${API_BASE}/evidence/${evidenceId}/analyze`, {
+  const endpoint = caseId
+    ? `${API_BASE}/cases/${caseId}/evidence/${evidenceId}/analyze`
+    : `${API_BASE}/evidence/${evidenceId}/analyze`;
+
+  const res = await fetch(endpoint, {
     method: 'POST',
     headers,
   });

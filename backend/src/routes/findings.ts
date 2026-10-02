@@ -12,8 +12,7 @@ const aiService = new AIService();
 const ocrService = new OCRService();
 const correlationEngine = new CorrelationEngine(aiService);
 
-// POST /api/evidence/:evidenceId/analyze - Trigger real AI/OCR analysis
-router.post('/evidence/:evidenceId/analyze', async (req: Request, res: Response, next: NextFunction) => {
+const analyzeEvidenceHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const evidenceIdParam = Array.isArray(req.params.evidenceId) ? req.params.evidenceId[0] : req.params.evidenceId;
 
@@ -34,6 +33,9 @@ router.post('/evidence/:evidenceId/analyze', async (req: Request, res: Response,
 
     // Update status to ANALYZING
     await supabase.from('evidence').update({ analysis_status: 'ANALYZING' }).eq('id', evidence.id);
+
+    // Clean up previous findings associated with this evidence prior to re-analysis to prevent duplicate findings
+    await supabase.from('findings').delete().eq('evidence_id', evidence.id);
 
     try {
       let aiResult;
@@ -156,7 +158,11 @@ router.post('/evidence/:evidenceId/analyze', async (req: Request, res: Response,
   } catch (err) {
     next(err);
   }
-});
+};
+
+// Support both /api/evidence/:evidenceId/analyze and /api/cases/:caseId/evidence/:evidenceId/analyze
+router.post('/evidence/:evidenceId/analyze', analyzeEvidenceHandler);
+router.post('/cases/:caseId/evidence/:evidenceId/analyze', analyzeEvidenceHandler);
 
 // GET /api/cases/:caseId/findings - Get all findings for a case
 router.get('/cases/:caseId/findings', async (req: Request, res: Response, next: NextFunction) => {

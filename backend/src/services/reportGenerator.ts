@@ -79,7 +79,6 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
         const fullTitle = `${numberStr}. ${titleStr}`;
         registerSection(fullTitle);
 
-        doc.moveDown(0.8);
         const y = doc.y;
 
         // Navy blue line left accent
@@ -88,9 +87,11 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
         doc.fillColor(COLORS.navyDark)
            .font('Helvetica-Bold')
            .fontSize(14)
-           .text(fullTitle, 55, y + 2);
+           .text(fullTitle, 55, y + 2, { width: 485, align: 'left' });
 
-        doc.moveDown(0.8);
+        const headerHeight = Math.max(22, doc.heightOfString(fullTitle, { width: 485 }));
+        doc.y = y + headerHeight + 4;
+
         doc.strokeColor(COLORS.border)
            .lineWidth(1)
            .moveTo(45, doc.y)
@@ -332,13 +333,18 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
         doc.moveDown(1);
       } else {
         findingsList.forEach((fnd, idx) => {
-          ensureSpace(120);
+            const titleText = `Finding #${idx + 1}: [${fnd.finding_id}] ${safeText(fnd.title)}`;
+            // Dynamically calculate header height so long titles (e.g. [FND-748A508F] Potential Security Breach...) wrap inside margin without text overflow
+            const titleHeight = doc.font('Helvetica-Bold').fontSize(10).heightOfString(titleText, { width: 360 });
+            const boxHeight = Math.max(28, titleHeight + 12);
+
+            ensureSpace(boxHeight + 80);
 
           const fndY = doc.y;
-          doc.rect(45, fndY, 505, 25).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
+            doc.rect(45, fndY, 505, boxHeight).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
 
           doc.fillColor(COLORS.navyDark).font('Helvetica-Bold').fontSize(10).text(
-            `Finding #${idx + 1}: [${fnd.finding_id}] ${safeText(fnd.title)}`, 55, fndY + 7
+              titleText, 55, fndY + 6, { width: 360, align: 'left' }
           );
 
           // Severity Badge
@@ -347,12 +353,12 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
           if (fnd.severity === 'HIGH') sevColor = COLORS.severityHigh;
           if (fnd.severity === 'MEDIUM') sevColor = COLORS.severityMedium;
 
-          doc.rect(430, fndY + 4, 110, 17).fill(sevColor);
+            doc.rect(430, fndY + 6, 110, 18).fill(sevColor);
           doc.fillColor(COLORS.white).font('Helvetica-Bold').fontSize(8.5).text(
-            fnd.severity, 430, fndY + 8, { width: 110, align: 'center' }
+              fnd.severity, 430, fndY + 9, { width: 110, align: 'center' }
           );
 
-          doc.y = fndY + 30;
+            doc.y = fndY + boxHeight + 8;
 
           // Finding Details
           doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(8.5);
