@@ -1,18 +1,29 @@
 import { Case, Evidence, Finding, DashboardStats, Correlation, AuditLog, Report } from '../types';
 import { supabase } from '../lib/supabase';
 
+export const DEFAULT_PRODUCTION_BACKEND_URL = 'https://forenziq-backend.onrender.com';
+
 export const getApiBase = (): string => {
   let rawUrl = import.meta.env.VITE_API_URL || '';
 
-  // Safety guard: if running in production browser on non-localhost domain, ignore localhost API URL
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  const isBrowser = typeof window !== 'undefined';
+  const isNonLocalhost = isBrowser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+  // Safety guard: if running in browser on non-localhost domain, ignore localhost API URL
+  if (isNonLocalhost) {
     if (rawUrl.includes('localhost') || rawUrl.includes('127.0.0.1')) {
       rawUrl = '';
     }
   }
 
   if (!rawUrl || rawUrl.trim() === '') {
-    return '/api';
+    if (isNonLocalhost) {
+      // In production browser deployment without explicit VITE_API_URL, default to deployed backend origin
+      rawUrl = DEFAULT_PRODUCTION_BACKEND_URL;
+    } else {
+      // In local development or node environment, fall back to relative /api (proxied by Vite)
+      return '/api';
+    }
   }
 
   const cleanUrl = rawUrl.trim().replace(/\/+$/, '');
