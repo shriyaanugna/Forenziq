@@ -5,6 +5,38 @@ interface Lock3DHeroProps {
   compact?: boolean;
 }
 
+// Continuous smooth 3D curve for the U-shaped shackle
+class ShackleCurve extends THREE.Curve<THREE.Vector3> {
+  constructor(
+    public radius: number = 1.35,
+    public legHeight: number = 1.75
+  ) {
+    super();
+  }
+
+  getPoint(t: number, optionalTarget = new THREE.Vector3()): THREE.Vector3 {
+    const legFrac = 0.35;
+    const archFrac = 0.30;
+
+    if (t < legFrac) {
+      // Left leg going up from 0 to legHeight
+      const p = t / legFrac;
+      return optionalTarget.set(-this.radius, p * this.legHeight, 0);
+    } else if (t <= legFrac + archFrac) {
+      // Top arch semi-circle from PI to 0
+      const p = (t - legFrac) / archFrac;
+      const angle = Math.PI - p * Math.PI;
+      const x = Math.cos(angle) * this.radius;
+      const y = this.legHeight + Math.sin(angle) * this.radius;
+      return optionalTarget.set(x, y, 0);
+    } else {
+      // Right leg going down from legHeight to 0
+      const p = (t - legFrac - archFrac) / legFrac;
+      return optionalTarget.set(this.radius, this.legHeight * (1 - p), 0);
+    }
+  }
+}
+
 export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasWebGL, setHasWebGL] = useState<boolean>(true);
@@ -33,8 +65,8 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
     const scene = new THREE.Scene();
 
     // 2. Camera setup
-    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
-    camera.position.set(0, 0, compact ? 15 : 18);
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 1000);
+    camera.position.set(0, 0.1, compact ? 13.5 : 14.5);
 
     // 3. Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -46,135 +78,105 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
     renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
 
-    // 4. Lighting setup (Studio Key, Fill, and Rim lights)
-    const ambientLight = new THREE.AmbientLight(0xdbeafe, 1.2);
+    // 4. Studio Lighting setup
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 1.4);
     scene.add(ambientLight);
 
-    // Studio Key Light (Top Right Cyan/White)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
-    keyLight.position.set(10, 15, 12);
+    // Main Key Light (Top Right White/Cyan)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
+    keyLight.position.set(8, 12, 10);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
     scene.add(keyLight);
 
-    // Soft Cyan Fill Light
-    const fillLight = new THREE.DirectionalLight(0x06b6d4, 1.8);
-    fillLight.position.set(-12, -5, 10);
+    // Soft Cyan Fill Light (Left Bottom)
+    const fillLight = new THREE.DirectionalLight(0x06b6d4, 1.6);
+    fillLight.position.set(-10, -4, 8);
     scene.add(fillLight);
 
-    // Blue Rim Light (Backlight)
-    const rimLight = new THREE.PointLight(0x3b82f6, 3, 30);
-    rimLight.position.set(0, 8, -10);
+    // Deep Blue Backlight / Rim Light
+    const rimLight = new THREE.PointLight(0x2563eb, 3.5, 30);
+    rimLight.position.set(0, 6, -8);
     scene.add(rimLight);
 
-    // Light Sweep Point Light
-    const sweepLight = new THREE.PointLight(0x38bdf8, 2.5, 25);
-    sweepLight.position.set(0, 2, 8);
+    // Surface Light Sweep
+    const sweepLight = new THREE.PointLight(0x38bdf8, 1.8, 20);
+    sweepLight.position.set(0, 2, 6);
     scene.add(sweepLight);
 
-    // Keyhole Point Light (Soft Volumetric Glow)
-    const keyholeGlowLight = new THREE.PointLight(0x38bdf8, 2, 8);
-    keyholeGlowLight.position.set(0, -0.6, 1.8);
-    scene.add(keyholeGlowLight);
-
-    // Root Group for Lock
+    // Root Group for Entire Lock
     const lockGroup = new THREE.Group();
 
     // ==========================================
-    // A. ROUNDED SHACKLE (Royal Blue)
+    // A. THICK U-SHAPED SHACKLE (Royal Blue)
     // ==========================================
-    const shackleRadius = 2.1;
-    const shackleTube = 0.55;
-    const shackleLegHeight = 1.6;
+    const shackleRadius = 1.45;
+    const shackleLegHeight = 2.4;
+    const shackleTubeRadius = 0.48;
 
-    const shackleGroup = new THREE.Group();
+    const shackleCurve = new ShackleCurve(shackleRadius, shackleLegHeight);
+    const shackleGeo = new THREE.TubeGeometry(shackleCurve, 64, shackleTubeRadius, 32, false);
 
-    // Top Arc of Shackle (Half Torus)
-    const topArcGeo = new THREE.TorusGeometry(shackleRadius, shackleTube, 32, 64, Math.PI);
     const shackleMat = new THREE.MeshPhysicalMaterial({
-      color: 0x1d4ed8, // Royal Blue matching reference image
-      roughness: 0.18,
-      metalness: 0.15,
-      clearcoat: 0.8,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.9
+      color: 0x1d4ed8, // Rich Royal Blue
+      roughness: 0.15,
+      metalness: 0.2,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+      reflectivity: 0.95
     });
-    const topArcMesh = new THREE.Mesh(topArcGeo, shackleMat);
-    topArcMesh.rotation.z = Math.PI; // Arch pointing upwards
-    topArcMesh.position.y = shackleLegHeight;
-    shackleGroup.add(topArcMesh);
 
-    // Left Leg of Shackle
-    const legGeo = new THREE.CylinderGeometry(shackleTube, shackleTube, shackleLegHeight, 32);
-    const leftLegMesh = new THREE.Mesh(legGeo, shackleMat);
-    leftLegMesh.position.set(-shackleRadius, shackleLegHeight / 2, 0);
-    shackleGroup.add(leftLegMesh);
-
-    // Right Leg of Shackle
-    const rightLegMesh = new THREE.Mesh(legGeo, shackleMat);
-    rightLegMesh.position.set(shackleRadius, shackleLegHeight / 2, 0);
-    shackleGroup.add(rightLegMesh);
-
-    shackleGroup.position.y = 1.3;
-    lockGroup.add(shackleGroup);
+    const shackleMesh = new THREE.Mesh(shackleGeo, shackleMat);
+    shackleMesh.castShadow = true;
+    // Position shackle so its high U-arch extends prominently above the body top
+    shackleMesh.position.set(0, 0.4, 0.0);
+    lockGroup.add(shackleMesh);
 
     // ==========================================
-    // B. WIDE CYAN & TURQUOISE LOCK BODY
+    // B. LOCK BODY WITH CURVED BOTTOM & BEVELS
     // ==========================================
-    // Construct rounded rectangular body shape with curved bottom corners
-    const bodyWidth = 6.2;
-    const bodyHeight = 4.6;
-    const bodyDepth = 1.6;
-    const cornerRadius = 1.2;
+    // Matching the reference lock silhouette:
+    // Upper body width around 4.8, rounded upper corners, tapering downward to a smooth curved bottom.
+    const bodyShape = new THREE.Shape();
 
-    const shape = new THREE.Shape();
-    const x = -bodyWidth / 2;
-    const y = -bodyHeight / 2;
+    const topW = 2.4; // half width at top (total width = 4.8)
+    const topY = 1.1;
+    const midY = 0.0;
+    const bottomY = -1.8;
+    const topCornerR = 0.5;
 
-    // Start top-left
-    shape.moveTo(x + cornerRadius, y + bodyHeight);
-    // Top line
-    shape.lineTo(x + bodyWidth - cornerRadius, y + bodyHeight);
-    // Top-right corner
-    shape.absarc(x + bodyWidth - cornerRadius, y + bodyHeight - cornerRadius, cornerRadius, Math.PI / 2, 0, true);
-    // Right line
-    shape.lineTo(x + bodyWidth, y + cornerRadius);
-    // Bottom-right rounded corner
-    shape.absarc(x + bodyWidth - cornerRadius, y + cornerRadius, cornerRadius, 0, -Math.PI / 2, true);
-    // Bottom line
-    shape.lineTo(x + cornerRadius, y);
-    // Bottom-left rounded corner
-    shape.absarc(x + cornerRadius, y + cornerRadius, cornerRadius, -Math.PI / 2, -Math.PI, true);
-    // Left line
-    shape.lineTo(x, y + bodyHeight - cornerRadius);
-    // Top-left corner
-    shape.absarc(x + cornerRadius, y + bodyHeight - cornerRadius, cornerRadius, Math.PI, Math.PI / 2, true);
+    // Outer counter-clockwise shape
+    bodyShape.moveTo(0, topY);
+    bodyShape.lineTo(topW - topCornerR, topY);
+    bodyShape.absarc(topW - topCornerR, topY - topCornerR, topCornerR, Math.PI / 2, 0, true);
+    bodyShape.lineTo(topW, midY);
+    bodyShape.bezierCurveTo(topW, midY - 1.0, topW * 0.55, bottomY, 0, bottomY);
+    bodyShape.bezierCurveTo(-topW * 0.55, bottomY, -topW, midY - 1.0, -topW, midY);
+    bodyShape.lineTo(-topW, topY - topCornerR);
+    bodyShape.absarc(-topW + topCornerR, topY - topCornerR, topCornerR, Math.PI, Math.PI / 2, true);
 
+    const bodyDepth = 0.85;
     const extrudeSettings = {
       depth: bodyDepth,
       bevelEnabled: true,
-      bevelSegments: 8,
+      bevelSegments: 10,
       steps: 2,
-      bevelSize: 0.35,
-      bevelThickness: 0.35,
+      bevelSize: 0.25,
+      bevelThickness: 0.25,
     };
 
-    const bodyGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, extrudeSettings);
     bodyGeo.center(); // Center geometry around origin
 
-    // Cyan / Turquoise Glossy Material matching reference image
+    // Bright Cyan / Turquoise Glossy Material
     const bodyMat = new THREE.MeshPhysicalMaterial({
-      color: 0x0ea5e9, // Bright cyan/turquoise
-      emissive: 0x0284c7,
+      color: 0x0284c7, // Vibrant Sky Cyan / Turquoise
+      emissive: 0x0369a1,
       emissiveIntensity: 0.1,
-      roughness: 0.15,
-      metalness: 0.1,
+      roughness: 0.18,
+      metalness: 0.08,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
-      transmission: 0.05, // Subtle volumetric glass effect
-      ior: 1.4,
-      reflectivity: 0.95
+      clearcoatRoughness: 0.05,
+      reflectivity: 0.98
     });
 
     const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
@@ -183,69 +185,75 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
     lockGroup.add(bodyMesh);
 
     // ==========================================
-    // C. CENTERED KEYHOLE WITH SOFT GLOW
+    // C. CRISP ICE-WHITE KEYHOLE SILHOUETTE
     // ==========================================
-    const keyholeGroup = new THREE.Group();
+    // Classic keyhole shape: round top head + straight tapering stem + rounded bottom
+    const keyholeShape = new THREE.Shape();
+    const headRadius = 0.38;
+    const headCenterY = 0.22;
+    const stemBottomY = -0.65;
+    const stemWidth = 0.20;
 
-    // Top Circle of Keyhole
-    const keyCircleGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.2, 32);
+    // Head circle arc
+    keyholeShape.absarc(0, headCenterY, headRadius, -0.4, Math.PI + 0.4, false);
+    // Right side stem line
+    keyholeShape.lineTo(stemWidth, stemBottomY);
+    // Stem bottom arc
+    keyholeShape.absarc(0, stemBottomY, stemWidth, 0, Math.PI, true);
+    // Left side stem line back to head
+    const leftStartX = -headRadius * Math.cos(0.4);
+    const leftStartY = headCenterY - headRadius * Math.sin(0.4);
+    keyholeShape.lineTo(leftStartX, leftStartY);
+
+    const keyholeExtrudeSettings = {
+      depth: 0.06,
+      bevelEnabled: true,
+      bevelSegments: 3,
+      steps: 1,
+      bevelSize: 0.02,
+      bevelThickness: 0.02,
+    };
+
+    const keyholeGeo = new THREE.ExtrudeGeometry(keyholeShape, keyholeExtrudeSettings);
+    keyholeGeo.center();
+
+    // Clean crisp Ice-White Material with subtle emissive, avoiding washed-out bloom
     const keyholeMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      emissive: 0xe0f2fe,
-      emissiveIntensity: 0.8,
-      roughness: 0.1,
-      metalness: 0.0
+      emissive: 0xbae6fd,
+      emissiveIntensity: 0.2,
+      roughness: 0.2,
+      metalness: 0.1,
     });
 
-    const keyCircle = new THREE.Mesh(keyCircleGeo, keyholeMat);
-    keyCircle.rotation.x = Math.PI / 2;
-    keyCircle.position.set(0, 0.25, bodyDepth / 2 + 0.18);
-    keyholeGroup.add(keyCircle);
+    const keyholeMesh = new THREE.Mesh(keyholeGeo, keyholeMat);
+    // Position keyhole exactly on the front face of the lock body
+    const frontZ = bodyDepth / 2 + 0.25;
+    keyholeMesh.position.set(0, -0.25, frontZ + 0.02);
+    lockGroup.add(keyholeMesh);
 
-    // Bottom Slot/Trapezoid of Keyhole
-    const keySlotGeo = new THREE.CylinderGeometry(0.32, 0.48, 0.75, 32);
-    const keySlot = new THREE.Mesh(keySlotGeo, keyholeMat);
-    keySlot.rotation.x = Math.PI / 2;
-    keySlot.position.set(0, -0.3, bodyDepth / 2 + 0.18);
-    keyholeGroup.add(keySlot);
-
-    // Dark Inner Keyhole Inset (Depth effect)
-    const keyholeBackMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
-    const keyBackCircle = new THREE.Mesh(keyCircleGeo, keyholeBackMat);
-    keyBackCircle.rotation.x = Math.PI / 2;
-    keyBackCircle.position.set(0, 0.25, bodyDepth / 2 + 0.05);
-    keyholeGroup.add(keyBackCircle);
-
-    const keyBackSlot = new THREE.Mesh(keySlotGeo, keyholeBackMat);
-    keyBackSlot.rotation.x = Math.PI / 2;
-    keyBackSlot.position.set(0, -0.3, bodyDepth / 2 + 0.05);
-    keyholeGroup.add(keyBackSlot);
-
-    keyholeGroup.position.y = -0.2;
-    lockGroup.add(keyholeGroup);
-
-    // Position Lock Group centered in scene
-    lockGroup.position.set(0, -0.4, 0);
+    // Center lock group vertically
+    lockGroup.position.set(0, -0.1, 0);
     scene.add(lockGroup);
 
     // ==========================================
-    // D. AMBIENT PARTICLES (Security Grid)
+    // D. BACKGROUND DIGITAL SECURITY PARTICLES
     // ==========================================
-    const particleCount = compact ? 80 : 160;
+    const particleCount = compact ? 70 : 140;
     const particlePositions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount * 3; i += 3) {
-      particlePositions[i] = (Math.random() - 0.5) * 30;
-      particlePositions[i + 1] = (Math.random() - 0.5) * 24;
-      particlePositions[i + 2] = (Math.random() - 0.5) * 20;
+      particlePositions[i] = (Math.random() - 0.5) * 28;
+      particlePositions[i + 1] = (Math.random() - 0.5) * 22;
+      particlePositions[i + 2] = (Math.random() - 0.5) * 18;
     }
 
     const particleGeo = new THREE.BufferGeometry();
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particleMat = new THREE.PointsMaterial({
       color: 0x38bdf8,
-      size: 0.2,
+      size: 0.18,
       transparent: true,
-      opacity: 0.5
+      opacity: 0.45
     });
     const particleSystem = new THREE.Points(particleGeo, particleMat);
     scene.add(particleSystem);
@@ -260,22 +268,21 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Gentle floating / hovering motion
-      lockGroup.position.y = -0.4 + Math.sin(elapsedTime * 1.5) * 0.35;
+      // Gentle vertical floating motion
+      lockGroup.position.y = -0.1 + Math.sin(elapsedTime * 1.4) * 0.24;
 
-      // Controlled, slow rotation to reveal 3D depth smoothly
-      lockGroup.rotation.y = Math.sin(elapsedTime * 0.7) * 0.38; // ~22 degrees left and right
-      lockGroup.rotation.x = Math.sin(elapsedTime * 0.5) * 0.08; // Subtle tilt up/down
+      // Controlled, smooth Y-axis oscillation (~16 degrees rotation left and right)
+      lockGroup.rotation.y = Math.sin(elapsedTime * 0.65) * 0.28;
 
-      // Light sweep across lock body surface
-      sweepLight.position.x = Math.sin(elapsedTime * 1.2) * 8;
-      sweepLight.position.y = Math.cos(elapsedTime * 0.8) * 4 + 2;
+      // Subtle fixed X-axis tilt to display top bevels and 3D volume
+      lockGroup.rotation.x = 0.06 + Math.sin(elapsedTime * 0.4) * 0.03;
 
-      // Soft pulsating keyhole glow
-      keyholeGlowLight.intensity = 1.8 + Math.sin(elapsedTime * 2.5) * 0.6;
+      // Light sweep movement across surfaces
+      sweepLight.position.x = Math.sin(elapsedTime * 1.1) * 7;
+      sweepLight.position.y = Math.cos(elapsedTime * 0.7) * 3 + 1;
 
-      // Rotate particle backdrop
-      particleSystem.rotation.y = elapsedTime * 0.04;
+      // Slow particle field drift
+      particleSystem.rotation.y = elapsedTime * 0.03;
 
       renderer.render(scene, camera);
     };
@@ -325,7 +332,7 @@ export default function Lock3DHero({ compact = false }: Lock3DHeroProps) {
       {/* 3D WebGL Canvas */}
       <div ref={containerRef} className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing" />
 
-      {/* Ambient Lighting Overlay Gradient */}
+      {/* Ambient Radial Highlight */}
       <div className="absolute inset-0 pointer-events-none bg-radial from-cyan-500/10 via-transparent to-transparent opacity-60" />
 
       {/* Floating Status Badge */}
