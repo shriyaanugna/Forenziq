@@ -15,33 +15,36 @@ export default function ReportsPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
-          <FileText className="w-7 h-7 text-slate-900 dark:text-cyan-400" /> Forensic Report Center
-        </h2>
-        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-          Persisted court-ready forensic PDF reports across all cases.
-        </p>
+    <div className="space-y-6 pb-8">
+      {/* Glass Header */}
+      <div className="astra-glass-card p-6 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+          <FileText className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Forensic Report Repository</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Persisted court-ready PDF reports across all forensic cases.
+          </p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="py-12 text-slate-500 dark:text-slate-400 font-mono animate-pulse">Loading report repository...</div>
+        <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse">Loading report repository...</div>
       ) : reports.length === 0 ? (
-        <div className="bg-white/80 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-8 text-center max-w-xl mx-auto space-y-2 text-slate-500 dark:text-slate-500 shadow-sm">
+        <div className="astra-glass-card p-12 text-center text-slate-400 text-xs">
           No reports generated yet. Generate reports directly inside a Case Workspace.
         </div>
       ) : (
-        <div className="space-y-3 font-mono text-xs max-w-4xl">
+        <div className="space-y-4 font-mono text-xs">
           {reports.map((rpt) => (
-            <div
-              key={rpt.id}
-              className="bg-white/80 backdrop-blur-md dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 flex items-center justify-between shadow-sm"
-            >
+            <div key={rpt.id} className="astra-glass-card p-5 flex items-center justify-between">
               <div>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">{rpt.report_id}</span>
-                <h4 className="font-sans font-semibold text-slate-900 dark:text-slate-200 mt-1 text-sm">{rpt.file_name}</h4>
-                <span className="text-[10px] text-slate-500 block mt-1">
+                <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                  {rpt.report_id}
+                </span>
+                <h4 className="font-sans font-bold text-slate-800 dark:text-slate-100 mt-2 text-sm">{rpt.file_name}</h4>
+                <span className="text-[10px] text-slate-400 block mt-1">
                   Created: {new Date(rpt.created_at).toUTCString()}
                 </span>
               </div>
@@ -50,9 +53,9 @@ export default function ReportsPage() {
                 href={`/api/reports/${rpt.report_id}?download=true`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 text-xs font-bold transition-colors shadow-sm"
+                className="astra-btn-primary text-xs"
               >
-                <Download className="w-4 h-4" /> Download PDF
+                <Download className="w-3.5 h-3.5" /> Download PDF
               </a>
             </div>
           ))}

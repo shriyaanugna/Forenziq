@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -34,89 +34,81 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#06090e] text-slate-900 dark:text-slate-100 flex flex-col justify-center items-center px-4 relative overflow-hidden font-sans transition-colors">
-      {/* Subtle Background Radial Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 dark:bg-cyan-950/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-astra-mesh text-slate-800 dark:text-slate-100 flex flex-col justify-center items-center px-4 relative overflow-hidden font-sans transition-colors">
 
       {/* Brand Header */}
       <div className="mb-8 text-center relative z-10">
-        <Link to="/" className="inline-flex items-center gap-2 mb-3 group">
-          <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-gradient-to-tr dark:from-cyan-600 dark:to-blue-600 p-[1px] flex items-center justify-center shadow-lg">
-            <div className="w-full h-full bg-slate-900 dark:bg-[#0d121c] rounded-[11px] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white dark:text-cyan-400" />
-            </div>
+        <Link to="/" className="inline-flex items-center gap-3 mb-3 group">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <ShieldCheck className="w-7 h-7" />
           </div>
-          <span className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            FOREN<span className="text-blue-600 dark:text-cyan-400">ZIQ</span>
+          <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+            FORENZIQ
           </span>
         </Link>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Welcome back</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Sign in to continue your digital forensic investigations.</p>
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Investigator Sign In</h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Access your automated digital forensics command workspace.</p>
       </div>
 
-      {/* Login Card */}
-      <div className="w-full max-w-md bg-white/80 dark:bg-[#0d121c]/90 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-8 shadow-2xl backdrop-blur-xl relative z-10">
+      {/* Login Glass Card */}
+      <div className="w-full max-w-md astra-glass-card p-8 relative z-10">
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="investigator@agency.gov"
                 required
-                className="w-full bg-slate-50 dark:bg-[#06090e] border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-cyan-500 transition-colors"
+                className="w-full pl-11 pr-4 py-3 rounded-full bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm transition-all"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                 Password
               </label>
-              <a href="#reset" onClick={(e) => { e.preventDefault(); alert('Password reset requested. Check your email instructions.'); }} className="text-xs text-blue-600 dark:text-cyan-400 hover:text-blue-500 dark:hover:text-cyan-300 transition-colors">
+              <a href="#reset" onClick={(e) => { e.preventDefault(); alert('Password reset requested.'); }} className="text-xs font-semibold text-blue-600 hover:underline">
                 Forgot password?
               </a>
             </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="w-full bg-slate-50 dark:bg-[#06090e] border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-cyan-500 transition-colors"
+                className="w-full pl-11 pr-11 py-3 rounded-full bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-gradient-to-r dark:from-cyan-500 dark:to-blue-600 dark:hover:from-cyan-400 dark:hover:to-blue-500 text-white dark:text-slate-950 font-bold py-3.5 px-4 rounded-xl text-sm transition-all duration-200 shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading} className="w-full astra-btn-primary py-3.5 text-sm font-bold">
             {loading ? (
-              <div className="w-5 h-5 border-2 border-white dark:border-slate-950 border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
                 <span>Sign In</span>
@@ -126,9 +118,9 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-800/60 pt-6">
+        <div className="mt-8 text-center text-xs text-slate-500 border-t border-slate-200/50 dark:border-slate-800/60 pt-6">
           Don't have an investigator account?{' '}
-          <Link to="/register" className="text-blue-600 dark:text-cyan-400 hover:text-blue-500 dark:hover:text-cyan-300 font-semibold transition-colors">
+          <Link to="/register" className="text-blue-600 font-bold hover:underline">
             Create an Account
           </Link>
         </div>

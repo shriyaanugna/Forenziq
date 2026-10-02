@@ -15,7 +15,8 @@ import {
   Database,
   Sparkles,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  ShieldCheck
 } from 'lucide-react';
 import Forensic3DHero from '../components/Forensic3DHero';
 
@@ -31,58 +32,46 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#06090e] text-slate-800 dark:text-slate-300 font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden relative transition-colors">
+    <div className="min-h-screen bg-astra-mesh text-slate-800 dark:text-slate-100 font-sans overflow-x-hidden relative transition-colors">
 
-      {/* Background Subtle Grid Effect */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-15 bg-repeat z-0"
-        style={{
-          backgroundImage: `radial-gradient(rgba(56, 189, 248, 0.25) 1px, transparent 0)`,
-          backgroundSize: '32px 32px'
-        }}
-      />
-
-      {/* Ambient Lighting Glows */}
-      <div className="fixed -top-40 -left-40 w-96 h-96 bg-blue-500/10 dark:bg-cyan-600/10 rounded-full blur-[128px] pointer-events-none z-0" />
-      <div className="fixed top-1/3 -right-40 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-600/10 rounded-full blur-[128px] pointer-events-none z-0" />
-
-      {/* 1. TOP NAVBAR */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl dark:bg-[#080c14]/80 border-b border-slate-200/80 dark:border-slate-800/80 px-6 py-4 transition-all shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      {/* Top Glass Navbar */}
+      <header className="sticky top-0 z-50 p-4">
+        <div className="max-w-7xl mx-auto px-6 py-3.5 bg-white/75 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/80 dark:border-slate-800/80 rounded-full shadow-xl shadow-indigo-900/5 flex items-center justify-between">
 
           {/* Logo & Brand */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-gradient-to-br dark:from-cyan-500 dark:via-blue-600 dark:to-indigo-700 flex items-center justify-center shadow-lg border border-slate-700 dark:border-cyan-400/30">
-              <ShieldAlert className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xl font-bold tracking-wider text-slate-900 dark:text-white font-mono">FORENZIQ</span>
-              <p className="text-[10px] text-cyan-600 dark:text-cyan-400 tracking-wider font-mono">AUTOMATED DIGITAL FORENSICS</p>
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                FORENZIQ
+              </span>
+              <p className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold tracking-wider uppercase">
+                AUTOMATED DIGITAL FORENSICS
+              </p>
             </div>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600 dark:text-slate-400">
-            <a href="#hero" className="text-slate-900 dark:text-slate-200 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">Home</a>
-            <a href="#how-it-works" className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">How It Works</a>
-            <a href="#capabilities" className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">Capabilities</a>
-            <a href="#preview" className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors">Workspace Preview</a>
+          <nav className="hidden md:flex items-center space-x-8 text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <a href="#hero" className="hover:text-blue-600 transition-colors">Home</a>
+            <a href="#how-it-works" className="hover:text-blue-600 transition-colors">How It Works</a>
+            <a href="#capabilities" className="hover:text-blue-600 transition-colors">Capabilities</a>
+            <a href="#preview" className="hover:text-blue-600 transition-colors">Workspace Preview</a>
           </nav>
 
           {/* Action Authentication Buttons */}
           <div className="flex items-center space-x-3">
             {user ? (
               <div className="flex items-center space-x-3">
-                <Link
-                  to="/dashboard"
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-cyan-500 dark:hover:bg-cyan-400 dark:text-slate-950 font-bold text-xs flex items-center space-x-1.5 transition-all shadow-sm"
-                >
+                <Link to="/dashboard" className="astra-btn-primary text-xs">
                   <UserIcon className="w-3.5 h-3.5" />
                   <span>Dashboard ({user.name || user.email.split('@')[0]})</span>
                 </Link>
                 <button
                   onClick={() => logout()}
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                  className="p-2.5 rounded-full bg-white/80 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 hover:bg-rose-50 text-slate-600 dark:text-slate-300 hover:text-rose-600 transition-colors"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -90,16 +79,10 @@ export default function LandingPage() {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white font-medium text-xs border border-slate-200 dark:border-slate-800 transition-colors"
-                >
+                <Link to="/login" className="astra-btn-secondary text-xs">
                   Sign In
                 </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-gradient-to-r dark:from-cyan-500 dark:via-blue-600 dark:to-indigo-600 text-white dark:text-slate-950 font-bold text-xs shadow-sm flex items-center space-x-1.5 transition-all transform hover:-translate-y-0.5"
-                >
+                <Link to="/register" className="astra-btn-primary text-xs">
                   <span>Sign Up</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -110,101 +93,78 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* 2. HERO SECTION */}
-      <section id="hero" className="relative z-10 pt-12 pb-20 px-6 max-w-7xl mx-auto">
+      {/* HERO SECTION */}
+      <section id="hero" className="relative z-10 pt-10 pb-20 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-          {/* Left Column: Editorial Headline & Copy */}
           <div className="lg:col-span-6 space-y-6">
-
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900 text-white dark:bg-cyan-500/10 dark:border dark:border-cyan-500/20 dark:text-cyan-400 text-xs font-mono tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <div className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>AI-POWERED DIGITAL FORENSICS</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal text-slate-900 dark:text-white tracking-tight leading-[1.15]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12]">
               Every digital trace <br />
-              tells a <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 dark:from-emerald-400 dark:via-cyan-400 dark:to-blue-500">story.</span>
+              tells a <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-500 bg-clip-text text-transparent">story.</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
-              FORENZIQ transforms complex digital evidence into structured, AI-assisted forensic investigations and detailed reports. Analyze evidence, uncover suspicious patterns, and turn raw investigation data into actionable insights.
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl">
+              FORENZIQ transforms complex digital evidence into structured, AI-assisted forensic investigations and detailed court-ready PDF reports.
             </p>
 
-            {/* Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              <Link
-                to={user ? "/dashboard" : "/register"}
-                className="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-gradient-to-r dark:from-cyan-500 dark:to-blue-600 dark:hover:from-cyan-400 dark:hover:to-blue-500 dark:text-slate-950 font-bold text-sm shadow-lg flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-0.5"
-              >
-                <span>{user ? "Go to Dashboard" : "Get Started"}</span>
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <Link to={user ? "/dashboard" : "/register"} className="astra-btn-primary text-sm px-6 py-3.5">
+                <span>{user ? "Go to Dashboard" : "Get Started Now"}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
-              {!user && (
-                <Link
-                  to="/login"
-                  className="px-6 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 dark:bg-slate-900/80 dark:hover:bg-slate-800 dark:text-slate-300 font-medium text-sm border border-slate-200 dark:border-slate-800 flex items-center justify-center space-x-2 transition-all shadow-sm"
-                >
-                  <span>Sign In to Account</span>
-                </Link>
-              )}
-
-              <button
-                onClick={scrollToHowItWorks}
-                className="px-6 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900/40 dark:hover:bg-slate-800 dark:text-slate-400 font-medium text-sm border border-slate-200 dark:border-slate-800/60 flex items-center justify-center space-x-2 transition-all cursor-pointer"
-              >
+              <button onClick={scrollToHowItWorks} className="astra-btn-secondary text-sm px-6 py-3.5">
                 <span>Discover How It Works</span>
               </button>
             </div>
 
-            {/* Product Metrics Grid */}
-            <div className="pt-8 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-3 gap-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+            <div className="pt-8 border-t border-slate-200/50 dark:border-slate-800/60 grid grid-cols-3 gap-4 font-mono text-xs text-slate-500 dark:text-slate-400">
               <div className="space-y-1">
-                <div className="text-slate-900 dark:text-white font-bold text-base">Multi-AI Engine</div>
-                <div className="text-slate-500">Groq • Cerebras • Gemini</div>
+                <div className="text-slate-900 dark:text-white font-bold text-sm">Multi-AI Engine</div>
+                <div className="text-slate-400 text-[11px]">Groq • Cerebras • Gemini</div>
               </div>
-              <div className="space-y-1 border-l border-slate-200 dark:border-slate-800 pl-4">
-                <div className="text-slate-900 dark:text-white font-bold text-base">SHA-256 Chain</div>
-                <div className="text-slate-500">Immutable Custody</div>
+              <div className="space-y-1 border-l border-slate-200/50 dark:border-slate-800/60 pl-4">
+                <div className="text-slate-900 dark:text-white font-bold text-sm">SHA-256 Chain</div>
+                <div className="text-slate-400 text-[11px]">Immutable Custody</div>
               </div>
-              <div className="space-y-1 border-l border-slate-200 dark:border-slate-800 pl-4">
-                <div className="text-emerald-700 dark:text-emerald-400 font-bold text-base">PDF Reports</div>
-                <div className="text-slate-500">Server PDFKit Engine</div>
+              <div className="space-y-1 border-l border-slate-200/50 dark:border-slate-800/60 pl-4">
+                <div className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">PDF Reports</div>
+                <div className="text-slate-400 text-[11px]">Server PDFKit Engine</div>
               </div>
             </div>
 
           </div>
 
-          {/* Right Column: 3D Forensic Canvas + Floating Dashboard Card */}
           <div className="lg:col-span-6 relative">
-
-            {/* 3D Visual Centerpiece */}
             <div className="w-full h-[460px]">
               <Forensic3DHero />
             </div>
 
-            {/* Floating Live Preview Glass Card Overlay */}
-            <div className="absolute -bottom-6 -left-4 sm:-left-6 right-4 sm:right-6 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border border-slate-200 dark:border-cyan-500/30 p-4 rounded-2xl shadow-2xl space-y-3 pointer-events-none">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
-                <div className="flex items-center space-x-2 text-xs font-mono text-slate-900 dark:text-cyan-400">
+            <div className="absolute -bottom-6 -left-4 sm:-left-6 right-4 sm:right-6 astra-glass-card p-5 space-y-3 pointer-events-none">
+              <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/60 pb-2">
+                <div className="flex items-center space-x-2 text-xs font-mono text-blue-600 dark:text-blue-400 font-bold">
                   <Cpu className="w-4 h-4" />
-                  <span>INVESTIGATION CASE WORKSPACE • ACTIVE</span>
+                  <span>INVESTIGATION WORKSPACE • ACTIVE</span>
                 </div>
-                <span className="px-2 py-0.5 text-[10px] font-mono bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 rounded">VERIFIED</span>
+                <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">VERIFIED</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800">
-                  <div className="text-[10px] font-mono text-slate-500">LATEST FINDING</div>
-                  <div className="font-semibold text-slate-900 dark:text-white mt-0.5">Crypto Wallet Cross-Match</div>
-                  <div className="text-[10px] font-mono text-rose-600 dark:text-rose-400 mt-1">Severity: CRITICAL (96% Conf.)</div>
+                <div className="p-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60">
+                  <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">LATEST FINDING</div>
+                  <div className="font-bold text-slate-800 dark:text-slate-100 mt-0.5">Crypto Wallet Cross-Match</div>
+                  <div className="text-[10px] font-mono text-rose-600 dark:text-rose-400 mt-1">Severity: CRITICAL</div>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-lg border border-slate-200/80 dark:border-slate-800">
-                  <div className="text-[10px] font-mono text-slate-500">EVIDENCE INGESTION</div>
-                  <div className="font-semibold text-slate-900 dark:text-white mt-0.5">CHAT-4B2E8A1F • TXT</div>
-                  <div className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-1">SHA-256 Hash Confirmed</div>
+                <div className="p-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60">
+                  <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">EVIDENCE INGESTION</div>
+                  <div className="font-bold text-slate-800 dark:text-slate-100 mt-0.5">CHAT-4B2E8A1F • TXT</div>
+                  <div className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-1">SHA-256 Confirmed</div>
                 </div>
               </div>
             </div>
@@ -214,236 +174,59 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. SECTION 1: HOW FORENZIQ WORKS */}
-      <section id="how-it-works" className="relative z-10 py-20 px-6 border-t border-slate-200/80 dark:border-slate-900 bg-white/60 dark:bg-slate-950/50">
+      {/* SECTION 1: HOW FORENZIQ WORKS */}
+      <section id="how-it-works" className="relative z-10 py-20 px-6">
         <div className="max-w-7xl mx-auto space-y-12">
 
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <h2 className="text-xs font-mono text-blue-600 dark:text-cyan-400 uppercase tracking-widest">WORKFLOW PIPELINE</h2>
-            <p className="text-3xl font-serif text-slate-900 dark:text-white">Three steps from evidence to court-ready report</p>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Deterministic hashing, automated OCR/vision scanning, and cross-evidence correlation.</p>
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <h2 className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 uppercase tracking-widest">WORKFLOW PIPELINE</h2>
+            <p className="text-3xl font-extrabold text-slate-900 dark:text-white">Three Steps from Evidence to Court-Ready Report</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Deterministic hashing, automated OCR/vision scanning, and cross-evidence correlation.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-            {/* Step 1 */}
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-400 dark:hover:border-cyan-500/30 transition-all space-y-4 shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-cyan-500/10 border border-slate-200 dark:border-cyan-500/20 flex items-center justify-center text-slate-900 dark:text-cyan-400">
+            <div className="astra-glass-card p-6 space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
                 <Database className="w-6 h-6" />
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-slate-900 dark:text-cyan-400">STEP 01</span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">1. Collect Evidence</h3>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Upload image evidence (JPG, PNG, WEBP) or chat transcripts (TXT, CSV, JSON). FORENZIQ automatically computes cryptographic SHA-256 hashes and assigns globally unique evidence IDs.
+              <span className="astra-pill-badge bg-blue-100 text-blue-800 font-mono text-xs">STEP 01</span>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">1. Collect Evidence</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Upload image evidence or chat transcripts. FORENZIQ automatically computes cryptographic SHA-256 hashes and assigns globally unique evidence IDs.
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-400 dark:hover:border-cyan-500/30 transition-all space-y-4 shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center text-indigo-700 dark:text-indigo-400">
+            <div className="astra-glass-card p-6 space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
                 <GitMerge className="w-6 h-6" />
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-indigo-700 dark:text-indigo-400">STEP 02</span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">2. Analyze & Investigate</h3>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Multi-provider AI fallbacks (Groq, Cerebras, Gemini, OpenRouter) and OCR run entity extraction and suspicious content analysis. Deterministic severity scoring evaluates findings.
+              <span className="astra-pill-badge bg-indigo-100 text-indigo-800 font-mono text-xs">STEP 02</span>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">2. Analyze & Investigate</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Multi-provider AI fallbacks and OCR run entity extraction and suspicious content analysis. Deterministic severity scoring evaluates findings.
               </p>
             </div>
 
-            {/* Step 3 */}
-            <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-400 dark:hover:border-emerald-500/30 transition-all space-y-4 shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
+            <div className="astra-glass-card p-6 space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
                 <FileCheck2 className="w-6 h-6" />
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400">STEP 03</span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">3. Generate Reports</h3>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Compile findings, cross-evidence correlations, and immutable chain-of-custody audit logs into structured PDF reports rendered server-side and stored securely in Supabase Storage.
+              <span className="astra-pill-badge bg-emerald-100 text-emerald-800 font-mono text-xs">STEP 03</span>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">3. Generate Reports</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Compile findings, cross-evidence correlations, and immutable chain-of-custody audit logs into structured PDF reports stored in Supabase Storage.
               </p>
             </div>
-
           </div>
 
         </div>
       </section>
 
-      {/* 4. SECTION 2: CORE CAPABILITIES */}
-      <section id="capabilities" className="relative z-10 py-20 px-6 max-w-7xl mx-auto space-y-12">
-
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between border-b border-slate-200/80 dark:border-slate-800 pb-6">
-          <div>
-            <h2 className="text-xs font-mono text-slate-900 dark:text-cyan-400 uppercase tracking-widest">PLATFORM ARCHITECTURE</h2>
-            <p className="text-3xl font-serif text-slate-900 dark:text-white mt-1">Core Forensic Capabilities</p>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mt-2 md:mt-0 font-mono">
-            Built from scratch on Supabase PostgreSQL, Node.js REST API, and multi-LLM orchestration.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-          <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 transition-all space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-cyan-500/10 text-slate-900 dark:text-cyan-400 flex items-center justify-center">
-              <ImageIcon className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Image & Vision Forensics</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              OCR scanning and Gemini Vision analysis detect visible text, document headers, credentials, and suspicious visual context in image evidence.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 transition-all space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Chat & Text Intelligence</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Structured entity extraction identifies usernames, phone numbers, crypto wallet addresses, transaction IDs, URLs, and suspicious phrases across chat logs.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 transition-all space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 flex items-center justify-center">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Multi-AI Fallback Engine</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Resilient server-side provider order (Groq → Cerebras → Gemini → OpenRouter) ensures uninterrupted investigation analysis.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 transition-all space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 flex items-center justify-center">
-              <ShieldAlert className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Deterministic Severity Engine</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Reproducible scoring rules evaluate threat indicators, credential exposures, and financial risk into LOW, MEDIUM, HIGH, and CRITICAL severity classifications.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 transition-all space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center">
-              <Layers className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Cross-Evidence Correlation</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Pairwise entity matching connects evidence items across the same investigation case to expose hidden relationships and intelligence graphs.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 transition-all space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
-              <Lock className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Chain of Custody Audit</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Every action, evidence upload, AI analysis, and correlation is logged with SHA-256 hashes in an immutable audit trail.
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* 5. SECTION 3: WORKSPACE PREVIEW */}
-      <section id="preview" className="relative z-10 py-20 px-6 border-t border-slate-200/80 dark:border-slate-900 bg-white/60 dark:bg-slate-950/60">
-        <div className="max-w-7xl mx-auto space-y-8">
-
-          <div className="text-center space-y-2">
-            <h2 className="text-xs font-mono text-slate-900 dark:text-cyan-400 uppercase tracking-widest">CASE WORKSPACE</h2>
-            <p className="text-3xl font-serif text-slate-900 dark:text-white">Complete Investigation Workspace</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-              Inspect evidence vaults, view findings summaries, explore 2D force-directed relationship graphs, and download PDF reports directly.
-            </p>
-          </div>
-
-          {/* Interactive Workspace Preview Box */}
-          <div className="rounded-2xl border border-slate-200/80 dark:border-cyan-500/30 bg-white/80 dark:bg-slate-900/80 p-6 shadow-2xl space-y-6">
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-4 gap-3">
-              <div>
-                <div className="flex items-center space-x-2 font-mono text-xs">
-                  <span className="font-bold text-slate-900 dark:text-cyan-400">CASE-2025-089</span>
-                  <span className="px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 text-[10px]">CRITICAL SEVERITY</span>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">Operation DarkVault Extortion Investigation</h3>
-              </div>
-
-              <Link
-                to="/dashboard"
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-cyan-500 dark:hover:bg-cyan-400 dark:text-black font-bold text-xs flex items-center space-x-2 transition-all cursor-pointer shadow-sm"
-              >
-                <span>Open Workspace</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs font-mono">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
-                <div className="text-slate-500 flex items-center justify-between">
-                  <span>EVIDENCE VAULT</span>
-                  <span className="text-slate-900 dark:text-cyan-400">14 Items</span>
-                </div>
-                <div className="text-slate-800 dark:text-slate-200 font-sans">IMG-9F3A1D7C • Ransomware Screenshot</div>
-                <div className="text-[10px] text-slate-500">SHA-256: e3b0c44298fc1c149afbf4c8996fb924...</div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
-                <div className="text-slate-500 flex items-center justify-between">
-                  <span>FINDINGS DETECTED</span>
-                  <span className="text-rose-600 dark:text-rose-400">8 Findings</span>
-                </div>
-                <div className="text-slate-800 dark:text-slate-200 font-sans">FND-9A2E • Darknet Crypto Wallet Exposure</div>
-                <div className="text-[10px] text-emerald-700 dark:text-emerald-400">Deterministic Score: 8.8 / 10.0</div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
-                <div className="text-slate-500 flex items-center justify-between">
-                  <span>CROSS-CORRELATIONS</span>
-                  <span className="text-amber-600 dark:text-amber-400">3 Matches</span>
-                </div>
-                <div className="text-slate-800 dark:text-slate-200 font-sans">CRL-8821 • Crypto Wallet & Telegram Handle</div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400">Match Confidence: 96.4%</div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* 6. FINAL CALL TO ACTION */}
-      <section className="relative z-10 py-24 px-6 text-center max-w-4xl mx-auto space-y-6">
-        <h2 className="text-3xl sm:text-4xl font-serif text-slate-900 dark:text-white">
-          Turn digital evidence into meaningful insights.
-        </h2>
-        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-          Start your investigation with FORENZIQ's AI-assisted forensic analysis platform. Secure evidence, generate deterministic findings, and export official reports.
-        </p>
-
-        <div className="pt-2">
-          <Link
-            to={user ? "/dashboard" : "/register"}
-            className="px-8 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-gradient-to-r dark:from-cyan-500 dark:via-blue-600 dark:to-indigo-600 dark:hover:from-cyan-400 dark:hover:to-indigo-500 text-white dark:text-slate-950 font-bold text-base shadow-2xl inline-flex items-center space-x-3 transition-all transform hover:-translate-y-1"
-          >
-            <span>{user ? "Launch FORENZIQ Dashboard" : "Get Started Now"}</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
-
-      {/* 7. FOOTER */}
-      <footer className="border-t border-slate-200/80 dark:border-slate-900 bg-white dark:bg-slate-950 px-6 py-6 text-center text-xs font-mono text-slate-500">
+      {/* FOOTER */}
+      <footer className="px-6 py-6 text-center text-xs font-medium text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>FORENZIQ © 2025 • Automated Digital Forensics Platform</div>
-          <div className="flex items-center space-x-4 text-slate-600 dark:text-slate-400">
+          <div className="flex items-center space-x-4">
             <span>Supabase PostgreSQL</span>
             <span>•</span>
             <span>PDFKit Engine</span>
