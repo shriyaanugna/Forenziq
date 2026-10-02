@@ -11,6 +11,8 @@ export interface SeverityInput {
 export interface SeverityEvaluation {
   severity: SeverityLevel;
   score: number;
+  aiSuggestedSeverity: SeverityLevel;
+  decisionReason: string;
   reasons: string[];
 }
 
@@ -44,6 +46,7 @@ export interface SeverityEvaluation {
 export function evaluateSeverity(input: SeverityInput): SeverityEvaluation {
   let score = 0;
   const reasons: string[] = [];
+  const aiSuggested = input.suggestedSeverity || 'LOW';
 
   const textToScan = [
     input.textContext || '',
@@ -73,7 +76,7 @@ export function evaluateSeverity(input: SeverityInput): SeverityEvaluation {
   }
 
   // Rule 4: Financial & Fraud Indicators
-  const financialKeywords = ['credit_card', 'cvv', 'wire_transfer', 'unauthorized_transaction', 'crypto_wallet', 'bitcoin_tumbler'];
+  const financialKeywords = ['credit_card', 'cvv', 'wire_transfer', 'unauthorized_transaction', 'crypto_wallet', 'bitcoin_tumbler', 'transfer', 'recipient account', 'delete this conversation'];
   if (financialKeywords.some(kw => textToScan.includes(kw))) {
     score += 25;
     reasons.push('Detected potential financial fraud or illicit transactional indicators (+25)');
@@ -92,13 +95,13 @@ export function evaluateSeverity(input: SeverityInput): SeverityEvaluation {
   }
 
   // Rule 7: AI Suggested Severity Alignment
-  if (input.suggestedSeverity === 'CRITICAL') {
+  if (aiSuggested === 'CRITICAL') {
     score += 20;
     reasons.push('AI analysis suggested CRITICAL severity (+20)');
-  } else if (input.suggestedSeverity === 'HIGH') {
+  } else if (aiSuggested === 'HIGH') {
     score += 15;
     reasons.push('AI analysis suggested HIGH severity (+15)');
-  } else if (input.suggestedSeverity === 'MEDIUM') {
+  } else if (aiSuggested === 'MEDIUM') {
     score += 10;
     reasons.push('AI analysis suggested MEDIUM severity (+10)');
   }
@@ -109,7 +112,7 @@ export function evaluateSeverity(input: SeverityInput): SeverityEvaluation {
     reasons.push('Confidence is below 50%; reduced overall risk score');
   }
 
-  // Determine Severity Level from Score
+  // Determine Final Authoritative Severity Level from Score
   let severity: SeverityLevel = 'LOW';
   if (score >= 60) {
     severity = 'CRITICAL';
@@ -121,9 +124,16 @@ export function evaluateSeverity(input: SeverityInput): SeverityEvaluation {
     severity = 'LOW';
   }
 
+  let decisionReason = `Final severity assigned by deterministic severity engine (Score: ${score}).`;
+  if (aiSuggested !== severity) {
+    decisionReason = `AI suggested ${aiSuggested}, but authoritative deterministic evaluation assigned ${severity} based on score ${score}.`;
+  }
+
   return {
     severity,
     score,
+    aiSuggestedSeverity: aiSuggested,
+    decisionReason,
     reasons,
   };
 }

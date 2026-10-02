@@ -51,6 +51,9 @@ export interface ExtractedEntities {
   visible_text?: string[];
   documents?: string[];
   objects?: string[];
+  transaction_ids?: string[];
+  account_numbers?: string[];
+  crypto_addresses?: string[];
 }
 
 export interface SuspiciousIndicator {
@@ -69,6 +72,8 @@ export interface Finding {
   title: string;
   description: string;
   severity: SeverityLevel;
+  ai_suggested_severity?: SeverityLevel;
+  severity_score?: number;
   confidence: number;
   reasoning: string;
   entities: ExtractedEntities;

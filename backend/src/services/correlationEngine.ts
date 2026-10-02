@@ -26,7 +26,7 @@ export class CorrelationEngine {
    * Scans all findings within a case and evaluates cross-evidence correlations based on normalized entities.
    */
   async correlateCase(caseId: string): Promise<Correlation[]> {
-    // 1. Fetch all findings for the case
+    // 1. Fetch all findings for the case strictly scoped by case_id
     const { data: findings, error: fndErr } = await supabase
       .from('findings')
       .select('*, evidence(id, evidence_id, type)')
@@ -108,7 +108,7 @@ export class CorrelationEngine {
   async evaluateAndStore(candidate: CorrelationCandidate): Promise<Correlation | null> {
     const { caseId, sourceEvidenceId, targetEvidenceId, sourceFindingId, targetFindingId, entityType, entityValue } = candidate;
 
-    // Check if correlation already exists
+    // Check if correlation already exists (prevent duplicates)
     const { data: existing } = await supabase
       .from('correlations')
       .select('*')
@@ -126,11 +126,17 @@ export class CorrelationEngine {
     let confidence = 0.85; // Base strong match for exact normalized entity match
     let reason = `Exact normalized entity match on ${entityType.toUpperCase()}: '${entityValue}'.`;
 
-    // Certain high-uniqueness entity types receive higher confidence
-    const highUniquenessTypes = ['email', 'emails', 'ip_address', 'ip', 'phone_number', 'phone'];
+    const highUniquenessTypes = [
+      'email', 'emails',
+      'ip_address', 'ip',
+      'phone_number', 'phone',
+      'transaction_id', 'transaction_ids', 'txn_id',
+      'account_number', 'account_numbers',
+      'crypto_address', 'crypto_addresses'
+    ];
     if (highUniquenessTypes.includes(entityType.toLowerCase())) {
       confidence = 0.95;
-      reason += ' High-uniqueness entity match.';
+      reason += ' High-uniqueness forensic identifier match.';
     } else if (['people', 'organization', 'organizations', 'username'].includes(entityType.toLowerCase())) {
       confidence = 0.70; // Slightly ambiguous (names/organizations)
       reason += ' Name/username match evaluated for contextual ambiguity.';
@@ -178,7 +184,7 @@ export class CorrelationEngine {
       return null;
     }
 
-    // Log audit event
+    // Log chain-of-custody audit event
     await AuditService.logEvent({
       caseId,
       eventType: 'CORRELATION_CREATED',

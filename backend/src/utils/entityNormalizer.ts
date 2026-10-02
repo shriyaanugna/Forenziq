@@ -37,13 +37,22 @@ export function normalizeEntity(type: string, value: string): NormalizedEntity {
     case 'phone_number':
     case 'phone_numbers':
     case 'phone':
-      // Remove spaces, dashes, parens, keep + and digits
       normalized = original.replace(/[^\d+]/g, '');
       break;
 
     case 'username':
     case 'usernames':
       normalized = original.toLowerCase().replace(/^@/, '');
+      break;
+
+    case 'transaction_id':
+    case 'transaction_ids':
+    case 'txn_id':
+    case 'account_number':
+    case 'account_numbers':
+    case 'crypto_address':
+    case 'crypto_addresses':
+      normalized = original.toUpperCase().replace(/[\s-]/g, '');
       break;
 
     default:

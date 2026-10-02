@@ -2,13 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { generatePDFReport } from '../services/reportGenerator.js';
 
 describe('PDFkit Forensic Report Generator', () => {
-  it('should generate non-empty PDF report buffer', async () => {
+  it('should generate non-empty PDF report buffer with currency rendering', async () => {
     const mockData = {
       caseItem: {
         id: '11111111-1111-1111-1111-111111111111',
         case_id: 'CASE-12345678',
-        title: 'Operation CyberGuard',
-        description: 'Forensic evaluation of compromised assets',
+        title: 'Operation Fraud ₹25,000',
+        description: 'Forensic evaluation of ₹25,000, €25,000, $25,000, £25,000 transfers',
         status: 'OPEN' as const,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -27,6 +27,7 @@ describe('PDFkit Forensic Report Generator', () => {
           source: 'FILE_UPLOAD',
           uploaded_at: new Date().toISOString(),
           analysis_status: 'COMPLETED' as const,
+          metadata: { ocr_text: 'Transfer ₹25,000 or €25,000 immediately' },
         },
       ],
       findingsList: [
@@ -35,12 +36,14 @@ describe('PDFkit Forensic Report Generator', () => {
           finding_id: 'FND-87654321',
           case_id: '11111111-1111-1111-1111-111111111111',
           evidence_id: '22222222-2222-2222-2222-222222222222',
-          finding_type: 'CREDENTIAL_LEAK',
-          title: 'Exposed API Token',
-          description: 'High-entropy secret token identified in text.',
+          finding_type: 'FINANCIAL_FRAUD',
+          title: 'Illicit Transfer Demand ₹25,000',
+          description: 'Demanded ₹25,000 / $25,000 / €25,000',
           severity: 'HIGH' as const,
+          ai_suggested_severity: 'CRITICAL' as const,
+          severity_score: 45,
           confidence: 0.92,
-          reasoning: 'Matches known OAuth pattern.',
+          reasoning: 'AI suggested CRITICAL, deterministic score assigned HIGH.',
           entities: { emails: ['admin@target.com'] },
           indicators: [],
           created_at: new Date().toISOString(),
@@ -53,7 +56,6 @@ describe('PDFkit Forensic Report Generator', () => {
     const pdfBuffer = await generatePDFReport(mockData);
     expect(pdfBuffer).toBeInstanceOf(Buffer);
     expect(pdfBuffer.length).toBeGreaterThan(1000);
-    // PDF magic bytes check (%PDF-)
     expect(pdfBuffer.toString('utf-8', 0, 5)).toBe('%PDF-');
   });
 });
