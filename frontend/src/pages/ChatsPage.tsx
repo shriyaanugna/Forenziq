@@ -26,8 +26,8 @@ export default function ChatsPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Glass Header */}
-      <div className="astra-glass-card p-6 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+      <div className="astra-glass-card p-6 flex items-center gap-4 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-sky-950/80 text-indigo-600 dark:text-sky-400 border dark:border-sky-800/50 flex items-center justify-center shrink-0">
           <MessageSquare className="w-6 h-6" />
         </div>
         <div>
@@ -39,17 +39,17 @@ export default function ChatsPage() {
       </div>
 
       {loading ? (
-        <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse">Scanning chat vault...</div>
+        <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse dark:bg-[#0B1426]/90 dark:border-sky-900/40">Scanning chat vault...</div>
       ) : chats.length === 0 ? (
-        <div className="astra-glass-card p-12 text-center text-slate-400 text-xs">
+        <div className="astra-glass-card p-12 text-center text-slate-400 text-xs dark:bg-[#0B1426]/90 dark:border-sky-900/40">
           No chat or text evidence items stored yet.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {chats.map((chat) => (
-            <div key={chat.id} className="astra-glass-card p-5 space-y-3">
+            <div key={chat.id} className="astra-glass-card p-5 space-y-3 dark:bg-[#0B1426]/85 dark:border-sky-900/40">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="astra-pill-badge bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
+                <span className="astra-pill-badge bg-indigo-100 text-indigo-800 dark:bg-sky-950/80 dark:text-sky-300 dark:border dark:border-sky-800/50">
                   {chat.evidence_id}
                 </span>
                 <span className="astra-pill-badge bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">

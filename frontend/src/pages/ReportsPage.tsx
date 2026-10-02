@@ -17,8 +17,8 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Glass Header */}
-      <div className="astra-glass-card p-6 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+      <div className="astra-glass-card p-6 flex items-center gap-4 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border dark:border-emerald-800/50 flex items-center justify-center shrink-0">
           <FileText className="w-6 h-6" />
         </div>
         <div>
@@ -30,17 +30,19 @@ export default function ReportsPage() {
       </div>
 
       {loading ? (
-        <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse">Loading report repository...</div>
+        <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse dark:bg-[#0B1426]/90 dark:border-sky-900/40">
+          Loading report repository...
+        </div>
       ) : reports.length === 0 ? (
-        <div className="astra-glass-card p-12 text-center text-slate-400 text-xs">
+        <div className="astra-glass-card p-12 text-center text-slate-400 text-xs dark:bg-[#0B1426]/90 dark:border-sky-900/40">
           No reports generated yet. Generate reports directly inside a Case Workspace.
         </div>
       ) : (
         <div className="space-y-4 font-mono text-xs">
           {reports.map((rpt) => (
-            <div key={rpt.id} className="astra-glass-card p-5 flex items-center justify-between">
+            <div key={rpt.id} className="astra-glass-card p-5 flex items-center justify-between dark:bg-[#0B1426]/85 dark:border-sky-900/40">
               <div>
-                <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border dark:border-emerald-800/50">
                   {rpt.report_id}
                 </span>
                 <h4 className="font-sans font-bold text-slate-800 dark:text-slate-100 mt-2 text-sm">{rpt.file_name}</h4>

@@ -37,8 +37,8 @@ export default function NewCasePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-8">
       {/* Header Glass Card */}
-      <div className="astra-glass-card p-6 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+      <div className="astra-glass-card p-6 flex items-center gap-4 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
+        <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border dark:border-sky-800/50 flex items-center justify-center shrink-0">
           <FolderPlus className="w-6 h-6" />
         </div>
         <div>
@@ -50,14 +50,14 @@ export default function NewCasePage() {
       </div>
 
       {error && (
-        <div className="astra-glass-card p-4 bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-3">
+        <div className="astra-glass-card p-4 bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-3">
           <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Form Glass Card */}
-      <form onSubmit={handleSubmit} className="astra-glass-card p-8 space-y-6">
+      <form onSubmit={handleSubmit} className="astra-glass-card p-8 space-y-6 dark:bg-[#0B1426]/85 dark:border-sky-900/40">
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
             Case Title *
@@ -68,7 +68,7 @@ export default function NewCasePage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Operation CyberVault - Insider Threat Inquiry"
-            className="w-full px-4 py-3 rounded-full bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+            className="w-full px-4 py-3 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
           />
         </div>
 
@@ -81,7 +81,7 @@ export default function NewCasePage() {
             value={investigatorName}
             onChange={(e) => setInvestigatorName(e.target.value)}
             placeholder="e.g. Det. Alex Rivera / Digital Forensics Unit"
-            className="w-full px-4 py-3 rounded-full bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+            className="w-full px-4 py-3 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
           />
         </div>
 
@@ -94,13 +94,13 @@ export default function NewCasePage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Detailed overview of the incident, target accounts, or key objective..."
-            className="w-full p-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+            className="w-full p-4 rounded-2xl bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
           />
         </div>
 
-        <div className="pt-4 border-t border-slate-200/50 dark:border-slate-800/60 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-            <ShieldAlert className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        <div className="pt-4 border-t border-slate-200/50 dark:border-sky-900/30 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-400 font-medium">
+            <ShieldAlert className="w-4 h-4 text-sky-500 dark:text-sky-400" />
             <span>Generates immutable UUID and CASE-XXXXXXXX ID</span>
           </div>
 

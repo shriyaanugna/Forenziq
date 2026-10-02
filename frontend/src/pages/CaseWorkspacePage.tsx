@@ -161,12 +161,12 @@ export default function CaseWorkspacePage() {
   };
 
   if (loading) {
-    return <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse">Initializing case workspace...</div>;
+    return <div className="astra-glass-card p-12 text-center text-slate-400 font-semibold text-sm animate-pulse dark:bg-[#0B1426]/90">Initializing case workspace...</div>;
   }
 
   if (error || !caseItem) {
     return (
-      <div className="astra-glass-card p-6 bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300">
+      <div className="astra-glass-card p-6 bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300">
         <h3 className="font-bold flex items-center gap-2 text-base">
           <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400" /> Workspace Error
         </h3>
@@ -185,14 +185,14 @@ export default function CaseWorkspacePage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Top Glass Header */}
-      <div className="astra-glass-card p-6">
+      <div className="astra-glass-card p-6 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-mono text-xs">
+              <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-sky-950/80 dark:text-sky-300 dark:border dark:border-sky-800/50 font-mono text-xs">
                 {caseItem.case_id}
               </span>
-              <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+              <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border dark:border-emerald-800/50">
                 {caseItem.status}
               </span>
             </div>
@@ -206,39 +206,39 @@ export default function CaseWorkspacePage() {
             </button>
 
             <button onClick={handleRunCorrelationScan} disabled={correlating} className="astra-btn-secondary text-xs">
-              <Share2 className="w-4 h-4 text-amber-600" /> {correlating ? 'Scanning...' : 'Correlate Evidence'}
+              <Share2 className="w-4 h-4 text-amber-500" /> {correlating ? 'Scanning...' : 'Correlate Evidence'}
             </button>
 
             <button onClick={handleGenerateReport} disabled={generatingReportState} className="astra-btn-secondary text-xs">
-              <FileText className="w-4 h-4 text-emerald-600" /> {generatingReportState ? 'Generating...' : 'Generate PDF Report'}
+              <FileText className="w-4 h-4 text-emerald-500" /> {generatingReportState ? 'Generating...' : 'Generate PDF Report'}
             </button>
           </div>
         </div>
 
         {/* Quick Metrics Bar */}
-        <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-slate-800/60 grid grid-cols-2 md:grid-cols-6 gap-3 text-xs">
-          <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/60">
-            <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Evidence Files</span>
+        <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-sky-900/30 grid grid-cols-2 md:grid-cols-6 gap-3 text-xs">
+          <div className="bg-white/60 dark:bg-[#070e1e]/80 p-3 rounded-2xl border border-white/80 dark:border-sky-900/40">
+            <span className="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Evidence Files</span>
             <span className="text-base font-extrabold text-slate-800 dark:text-white mt-0.5 block">{evidenceList.length}</span>
           </div>
-          <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/60">
-            <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Findings Total</span>
+          <div className="bg-white/60 dark:bg-[#070e1e]/80 p-3 rounded-2xl border border-white/80 dark:border-sky-900/40">
+            <span className="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Findings Total</span>
             <span className="text-base font-extrabold text-slate-800 dark:text-white mt-0.5 block">{findingsList.length}</span>
           </div>
-          <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/60">
-            <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">High / Critical</span>
+          <div className="bg-white/60 dark:bg-[#070e1e]/80 p-3 rounded-2xl border border-white/80 dark:border-sky-900/40">
+            <span className="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase tracking-wider">High / Critical</span>
             <span className="text-base font-extrabold text-rose-600 dark:text-rose-400 mt-0.5 block">{criticalCount + highCount}</span>
           </div>
-          <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/60">
-            <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Correlations</span>
+          <div className="bg-white/60 dark:bg-[#070e1e]/80 p-3 rounded-2xl border border-white/80 dark:border-sky-900/40">
+            <span className="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Correlations</span>
             <span className="text-base font-extrabold text-amber-600 dark:text-amber-400 mt-0.5 block">{correlationsList.length}</span>
           </div>
-          <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/60">
-            <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Audit Trail</span>
-            <span className="text-base font-extrabold text-blue-600 dark:text-blue-400 mt-0.5 block">{auditLogs.length}</span>
+          <div className="bg-white/60 dark:bg-[#070e1e]/80 p-3 rounded-2xl border border-white/80 dark:border-sky-900/40">
+            <span className="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Audit Trail</span>
+            <span className="text-base font-extrabold text-sky-600 dark:text-sky-400 mt-0.5 block">{auditLogs.length}</span>
           </div>
-          <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/60">
-            <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider">Latest Activity</span>
+          <div className="bg-white/60 dark:bg-[#070e1e]/80 p-3 rounded-2xl border border-white/80 dark:border-sky-900/40">
+            <span className="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Latest Activity</span>
             <span className="text-[11px] text-slate-700 dark:text-slate-300 font-mono mt-0.5 block truncate">
               {latestAudit ? latestAudit.event_type : 'None'}
             </span>
@@ -247,7 +247,7 @@ export default function CaseWorkspacePage() {
       </div>
 
       {/* Workspace Navigation Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto p-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md rounded-full border border-white/60 dark:border-slate-800">
+      <div className="flex items-center gap-2 overflow-x-auto p-1.5 bg-white/40 dark:bg-[#0B1426]/70 backdrop-blur-md rounded-full border border-white/60 dark:border-sky-900/40">
         {[
           { key: 'EVIDENCE', label: `Evidence (${evidenceList.length})`, icon: FolderLock },
           { key: 'FINDINGS', label: `AI Findings (${findingsList.length})`, icon: ShieldAlert },
@@ -264,8 +264,8 @@ export default function CaseWorkspacePage() {
               onClick={() => setActiveTab(tab.key as any)}
               className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-all whitespace-nowrap ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800/50'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-cyan-500 text-white shadow-md shadow-sky-500/25'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-sky-950/40'
               }`}
             >
               <Icon className="w-3.5 h-3.5" /> {tab.label}
@@ -278,10 +278,10 @@ export default function CaseWorkspacePage() {
       {activeTab === 'EVIDENCE' && (
         <div className="space-y-3">
           {evidenceList.length === 0 ? (
-            <div className="astra-glass-card p-12 text-center">
-              <UploadCloud className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <div className="astra-glass-card p-12 text-center dark:bg-[#0B1426]/90 dark:border-sky-900/40">
+              <UploadCloud className="w-12 h-12 text-slate-300 dark:text-sky-700 mx-auto mb-3" />
               <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Evidence Uploaded</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
                 Upload images or chat logs to calculate SHA-256 and run real AI analysis.
               </p>
               <button onClick={() => setShowUploadModal(true)} className="astra-btn-primary text-xs inline-flex mt-4">
@@ -292,15 +292,15 @@ export default function CaseWorkspacePage() {
             evidenceList.map((ev) => {
               const isAnalyzing = analyzingIds[ev.id];
               return (
-                <div key={ev.id} className="astra-glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div key={ev.id} className="astra-glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#0B1426]/85 dark:border-sky-900/40">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-100 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border dark:border-sky-800/50 flex items-center justify-center shrink-0">
                       {ev.type === 'IMAGE' ? <ImageIcon className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-mono text-[11px]">
+                        <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-sky-950/80 dark:text-sky-300 dark:border dark:border-sky-800/50 font-mono text-[11px]">
                           {ev.evidence_id}
                         </span>
                         <span className="astra-pill-badge bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-mono text-[10px]">
@@ -313,8 +313,8 @@ export default function CaseWorkspacePage() {
 
                       <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 mt-2">{ev.file_name}</h4>
 
-                      <div className="flex items-center gap-1.5 mt-2 text-[11px] font-mono text-slate-500 bg-white/60 dark:bg-slate-800/60 px-3 py-1 rounded-full border border-white/80 dark:border-slate-700/60 max-w-fit">
-                        <Hash className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 mt-2 text-[11px] font-mono text-slate-500 bg-white/60 dark:bg-[#070e1e]/80 px-3 py-1 rounded-full border border-white/80 dark:border-sky-900/40 max-w-fit">
+                        <Hash className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400 shrink-0" />
                         <span className="font-semibold text-slate-400">SHA-256:</span>
                         <span className="truncate max-w-[280px] md:max-w-md text-slate-700 dark:text-slate-200">{ev.sha256_hash}</span>
                       </div>
@@ -332,7 +332,7 @@ export default function CaseWorkspacePage() {
                           <XCircle className="w-4 h-4" /> Failed
                         </span>
                       ) : ev.analysis_status === 'ANALYZING' || isAnalyzing ? (
-                        <span className="text-blue-600 dark:text-blue-400 flex items-center gap-1 animate-pulse">
+                        <span className="text-sky-500 dark:text-sky-400 flex items-center gap-1 animate-pulse">
                           <Clock className="w-4 h-4" /> Processing...
                         </span>
                       ) : (
@@ -361,7 +361,7 @@ export default function CaseWorkspacePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1 space-y-3">
             {findingsList.length === 0 ? (
-              <div className="astra-glass-card p-8 text-center text-slate-400 text-xs">
+              <div className="astra-glass-card p-8 text-center text-slate-400 text-xs dark:bg-[#0B1426]/90 dark:border-sky-900/40">
                 No findings generated yet. Trigger AI analysis on an evidence item.
               </div>
             ) : (
@@ -369,9 +369,9 @@ export default function CaseWorkspacePage() {
                 <div
                   key={fnd.id}
                   onClick={() => setSelectedFinding(fnd)}
-                  className={`astra-glass-card p-4 cursor-pointer transition-all ${
+                  className={`astra-glass-card p-4 cursor-pointer transition-all dark:bg-[#0B1426]/85 dark:border-sky-900/40 ${
                     selectedFinding?.id === fnd.id
-                      ? 'ring-2 ring-blue-600 shadow-md'
+                      ? 'ring-2 ring-sky-500 dark:ring-sky-400 shadow-md'
                       : 'hover:scale-[1.01]'
                   }`}
                 >
@@ -379,11 +379,11 @@ export default function CaseWorkspacePage() {
                     <span
                       className={`astra-pill-badge ${
                         fnd.severity === 'CRITICAL'
-                          ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300'
+                          ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border dark:border-rose-800/60'
                           : fnd.severity === 'HIGH'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border dark:border-amber-800/60'
                           : fnd.severity === 'MEDIUM'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border dark:border-amber-800/50'
                           : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                       }`}
                     >
@@ -401,15 +401,15 @@ export default function CaseWorkspacePage() {
 
           <div className="md:col-span-2">
             {!selectedFinding ? (
-              <div className="astra-glass-card h-full min-h-[300px] flex flex-col items-center justify-center p-8 text-center text-slate-400">
+              <div className="astra-glass-card h-full min-h-[300px] flex flex-col items-center justify-center p-8 text-center text-slate-400 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
                 <FileText className="w-10 h-10 mb-2 opacity-50" />
                 <p className="text-xs">Select a finding from the list to view detailed extracted entities and reasoning.</p>
               </div>
             ) : (
-              <div className="astra-glass-card p-6 space-y-6">
+              <div className="astra-glass-card p-6 space-y-6 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-mono text-xs">
+                    <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-sky-950/80 dark:text-sky-300 dark:border dark:border-sky-800/50 font-mono text-xs">
                       {selectedFinding.finding_id}
                     </span>
                     <span className="text-xs font-semibold text-slate-400">
@@ -420,8 +420,8 @@ export default function CaseWorkspacePage() {
                   <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">{selectedFinding.description}</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-200 space-y-1">
-                  <span className="font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block mb-1">
+                <div className="p-4 rounded-2xl bg-white/60 dark:bg-[#070e1e]/80 border border-white/80 dark:border-sky-900/40 text-xs text-slate-700 dark:text-slate-200 space-y-1">
+                  <span className="font-bold text-sky-500 dark:text-sky-400 uppercase tracking-wider block mb-1">
                     Deterministic Engine Reasoning:
                   </span>
                   <p className="whitespace-pre-wrap font-mono leading-relaxed">{selectedFinding.reasoning}</p>
@@ -435,8 +435,8 @@ export default function CaseWorkspacePage() {
                     {Object.entries(selectedFinding.entities || {}).map(([key, val]) => {
                       if (!val || (Array.isArray(val) && val.length === 0)) return null;
                       return (
-                        <div key={key} className="p-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60">
-                          <span className="text-blue-600 dark:text-blue-400 font-bold capitalize block">{key.replace('_', ' ')}:</span>
+                        <div key={key} className="p-3 rounded-2xl bg-white/60 dark:bg-[#070e1e]/80 border border-white/80 dark:border-sky-900/40">
+                          <span className="text-sky-500 dark:text-sky-400 font-bold capitalize block">{key.replace('_', ' ')}:</span>
                           <span className="text-slate-700 dark:text-slate-200 block mt-1">
                             {Array.isArray(val) ? val.join(', ') : String(val)}
                           </span>
@@ -454,7 +454,7 @@ export default function CaseWorkspacePage() {
       {/* CORRELATIONS TAB */}
       {activeTab === 'CORRELATIONS' && (
         <div className="space-y-4">
-          <div className="astra-glass-card p-5 flex items-center justify-between">
+          <div className="astra-glass-card p-5 flex items-center justify-between dark:bg-[#0B1426]/90 dark:border-sky-900/40">
             <div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">Cross-Evidence Correlation Engine</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -467,15 +467,15 @@ export default function CaseWorkspacePage() {
           </div>
 
           {correlationsList.length === 0 ? (
-            <div className="astra-glass-card p-12 text-center text-slate-400 text-xs">
+            <div className="astra-glass-card p-12 text-center text-slate-400 text-xs dark:bg-[#0B1426]/90 dark:border-sky-900/40">
               No cross-evidence correlations detected yet. Upload multiple evidence files with shared entities to correlate.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {correlationsList.map((crl) => (
-                <div key={crl.id} className="astra-glass-card p-5 space-y-3">
+                <div key={crl.id} className="astra-glass-card p-5 space-y-3 dark:bg-[#0B1426]/85 dark:border-sky-900/40">
                   <div className="flex items-center justify-between">
-                    <span className="astra-pill-badge bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 font-mono text-xs">
+                    <span className="astra-pill-badge bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 font-mono text-xs border dark:border-amber-800/60">
                       {crl.correlation_id}
                     </span>
                     <span className="text-xs font-semibold text-slate-400">
@@ -483,7 +483,7 @@ export default function CaseWorkspacePage() {
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60">
+                  <div className="p-3 rounded-2xl bg-white/60 dark:bg-[#070e1e]/80 border border-white/80 dark:border-sky-900/40">
                     <span className="text-[10px] uppercase font-bold text-slate-400 block">Matched Entity</span>
                     <span className="text-slate-800 dark:text-slate-100 font-mono font-bold text-xs block mt-0.5">
                       {crl.matched_entity_value} ({crl.matched_entity_type})
@@ -509,12 +509,12 @@ export default function CaseWorkspacePage() {
 
       {/* AUDIT TAB */}
       {activeTab === 'AUDIT' && (
-        <div className="astra-glass-card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/60 pb-3">
+        <div className="astra-glass-card p-6 space-y-4 dark:bg-[#0B1426]/90 dark:border-sky-900/40">
+          <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-sky-900/30 pb-3">
             <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
-              <History className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Chronological Chain of Custody Audit Trail
+              <History className="w-4 h-4 text-sky-500 dark:text-sky-400" /> Chronological Chain of Custody Audit Trail
             </h3>
-            <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-mono text-xs">
+            <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-sky-950/80 dark:text-sky-300 dark:border dark:border-sky-800/50 font-mono text-xs">
               {auditLogs.length} Immutable Events
             </span>
           </div>
@@ -524,8 +524,8 @@ export default function CaseWorkspacePage() {
           ) : (
             <div className="space-y-3 font-mono text-xs">
               {auditLogs.map((log) => (
-                <div key={log.id} className="p-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60 flex items-start gap-3">
-                  <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 text-[10px] shrink-0 mt-0.5">
+                <div key={log.id} className="p-3 rounded-2xl bg-white/60 dark:bg-[#070e1e]/80 border border-white/80 dark:border-sky-900/40 flex items-start gap-3">
+                  <span className="astra-pill-badge bg-blue-100 text-blue-800 dark:bg-sky-950/80 dark:text-sky-300 text-[10px] shrink-0 mt-0.5 dark:border dark:border-sky-800/50">
                     {log.event_type}
                   </span>
                   <div className="flex-1">
@@ -544,7 +544,7 @@ export default function CaseWorkspacePage() {
       {/* REPORTS TAB */}
       {activeTab === 'REPORTS' && (
         <div className="space-y-4">
-          <div className="astra-glass-card p-5 flex items-center justify-between">
+          <div className="astra-glass-card p-5 flex items-center justify-between dark:bg-[#0B1426]/90 dark:border-sky-900/40">
             <div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">Court-Ready Forensic PDF Export</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -557,15 +557,15 @@ export default function CaseWorkspacePage() {
           </div>
 
           {reportsList.length === 0 ? (
-            <div className="astra-glass-card p-12 text-center text-slate-400 text-xs">
+            <div className="astra-glass-card p-12 text-center text-slate-400 text-xs dark:bg-[#0B1426]/90 dark:border-sky-900/40">
               No reports generated for this case yet. Click 'Generate New Report' to assemble forensic PDF.
             </div>
           ) : (
             <div className="space-y-3 font-mono text-xs">
               {reportsList.map((rpt) => (
-                <div key={rpt.id} className="astra-glass-card p-4 flex items-center justify-between">
+                <div key={rpt.id} className="astra-glass-card p-4 flex items-center justify-between dark:bg-[#0B1426]/85 dark:border-sky-900/40">
                   <div>
-                    <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 text-xs">
+                    <span className="astra-pill-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border dark:border-emerald-800/50 text-xs">
                       {rpt.report_id}
                     </span>
                     <h4 className="font-sans font-bold text-slate-800 dark:text-slate-100 mt-1">{rpt.file_name}</h4>
@@ -591,11 +591,11 @@ export default function CaseWorkspacePage() {
 
       {/* UPLOAD EVIDENCE MODAL */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="astra-glass-card max-w-lg w-full p-6 space-y-5 bg-white/95 dark:bg-slate-900/95 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/60 pb-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="astra-glass-card max-w-lg w-full p-6 space-y-5 bg-white/95 dark:bg-[#0B1426]/95 dark:border-sky-900/60 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-sky-900/40 pb-4">
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <UploadCloud className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Evidence Intake
+                <UploadCloud className="w-5 h-5 text-sky-500 dark:text-sky-400" /> Evidence Intake
               </h3>
               <button
                 onClick={() => setShowUploadModal(false)}
@@ -606,7 +606,7 @@ export default function CaseWorkspacePage() {
             </div>
 
             {uploadError && (
-              <div className="p-3 rounded-2xl bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200 text-rose-800 dark:text-rose-300 text-xs">
+              <div className="p-3 rounded-2xl bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs">
                 {uploadError}
               </div>
             )}
@@ -620,15 +620,15 @@ export default function CaseWorkspacePage() {
                   type="file"
                   accept="image/jpeg,image/png,image/webp,text/plain,text/csv,application/json"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-950/60 dark:file:text-blue-300 hover:file:bg-blue-100 cursor-pointer"
+                  className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 dark:file:bg-sky-950/60 dark:file:text-sky-300 hover:file:bg-sky-100 cursor-pointer"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">Supported: JPG, PNG, WEBP, TXT, CSV, JSON (Max 10MB)</p>
               </div>
 
               <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-slate-200/50 dark:border-slate-800/60"></div>
+                <div className="flex-grow border-t border-slate-200/50 dark:border-sky-900/40"></div>
                 <span className="flex-shrink mx-4 text-[10px] uppercase font-bold text-slate-400">OR</span>
-                <div className="flex-grow border-t border-slate-200/50 dark:border-slate-800/60"></div>
+                <div className="flex-grow border-t border-slate-200/50 dark:border-sky-900/40"></div>
               </div>
 
               <div>
@@ -640,11 +640,11 @@ export default function CaseWorkspacePage() {
                   value={pastedText}
                   onChange={(e) => setPastedText(e.target.value)}
                   placeholder="Paste chat history, header logs, or raw terminal output..."
-                  className="w-full p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                  className="w-full p-3 rounded-2xl bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-200/50 dark:border-slate-800/60 flex justify-end gap-3">
+              <div className="pt-3 border-t border-slate-200/50 dark:border-sky-900/40 flex justify-end gap-3">
                 <button type="button" onClick={() => setShowUploadModal(false)} className="astra-btn-secondary text-xs">
                   Cancel
                 </button>

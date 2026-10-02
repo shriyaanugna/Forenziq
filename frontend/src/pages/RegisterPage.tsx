@@ -54,13 +54,13 @@ export const RegisterPage: React.FC = () => {
       {/* Brand Header */}
       <div className="mb-8 text-center relative z-10">
         <Link to="/" className="inline-flex items-center gap-2.5 mb-3 group">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 p-0.5 shadow-lg shadow-blue-500/20">
-            <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[14px] flex items-center justify-center">
-              <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-blue-600 to-cyan-500 p-0.5 shadow-lg shadow-sky-500/20">
+            <div className="w-full h-full bg-white dark:bg-[#0B1426] rounded-[14px] flex items-center justify-center">
+              <Shield className="w-6 h-6 text-sky-500 dark:text-sky-400" />
             </div>
           </div>
           <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-            FOREN<span className="text-blue-600 dark:text-blue-400">ZIQ</span>
+            FOREN<span className="text-sky-500 dark:text-sky-400">ZIQ</span>
           </span>
         </Link>
         <h1 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Create your FORENZIQ account</h1>
@@ -68,9 +68,9 @@ export const RegisterPage: React.FC = () => {
       </div>
 
       {/* Signup Card */}
-      <div className="w-full max-w-md astra-glass-card rounded-3xl p-8 relative z-10">
+      <div className="w-full max-w-md astra-glass-card rounded-3xl p-8 relative z-10 dark:bg-[#0B1426]/90 dark:border-sky-900/50">
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-3">
+          <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-3">
             <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -78,7 +78,7 @@ export const RegisterPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Full Name
             </label>
             <div className="relative">
@@ -89,13 +89,13 @@ export const RegisterPage: React.FC = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Agent Alex Vance"
                 required
-                className="astra-pill-input w-full pl-11 pr-4 py-2.5 text-sm"
+                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Email Address
             </label>
             <div className="relative">
@@ -106,13 +106,13 @@ export const RegisterPage: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="investigator@agency.gov"
                 required
-                className="astra-pill-input w-full pl-11 pr-4 py-2.5 text-sm"
+                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Password
             </label>
             <div className="relative">
@@ -123,7 +123,7 @@ export const RegisterPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="astra-pill-input w-full pl-11 pr-11 py-2.5 text-sm"
+                className="w-full pl-11 pr-11 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
               />
               <button
                 type="button"
@@ -136,7 +136,7 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Confirm Password
             </label>
             <div className="relative">
@@ -147,13 +147,13 @@ export const RegisterPage: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="astra-pill-input w-full pl-11 pr-4 py-2.5 text-sm"
+                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
               />
             </div>
           </div>
 
           {/* Password Guidance */}
-          <div className="p-3 bg-slate-100/60 dark:bg-slate-800/40 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+          <div className="p-3 bg-white/60 dark:bg-[#070e1e]/80 rounded-2xl border border-slate-200/50 dark:border-sky-900/40 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded-full flex items-center justify-center ${isMinLength ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
                 <Check className="w-3 h-3 stroke-[3]" />
@@ -184,9 +184,9 @@ export const RegisterPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/60 dark:border-slate-800/60 pt-5">
+        <div className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/60 dark:border-sky-900/30 pt-5">
           Already registered?{' '}
-          <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-bold transition-colors">
+          <Link to="/login" className="text-sky-500 dark:text-sky-400 hover:underline font-bold transition-colors">
             Sign In
           </Link>
         </div>
