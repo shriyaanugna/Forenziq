@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Lock, Mail, User, Eye, EyeOff, AlertCircle, Check, ArrowRight, CheckCircle2 } from 'lucide-react';
@@ -13,6 +13,8 @@ export const RegisterPage: React.FC = () => {
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isSubmittingRef = useRef(false);
+
   const { signup } = useAuth();
   const navigate = useNavigate();
 
@@ -22,11 +24,25 @@ export const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (loading || isSubmittingRef.current) {
+      return;
+    }
+
     setError(null);
     setInfo(null);
 
-    if (!email || !password || !name) {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName || !trimmedEmail || !password) {
       setError('Please fill in all required fields.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError('Please enter a valid email address.');
       return;
     }
 
@@ -40,16 +56,24 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
-    const res = await signup(email, password, name);
-    setLoading(false);
 
-    if (res.error) {
-      setError(res.error);
-    } else if (res.info) {
-      setInfo(res.info);
-    } else {
-      navigate('/dashboard');
+    try {
+      const res = await signup(trimmedEmail, password, trimmedName);
+
+      if (res.error) {
+        setError(res.error);
+      } else if (res.info) {
+        setInfo(res.info);
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err: any) {
+      setError(err?.message || 'An unexpected error occurred during account creation.');
+    } finally {
+      isSubmittingRef.current = false;
+      setLoading(false);
     }
   };
 
@@ -97,10 +121,11 @@ export const RegisterPage: React.FC = () => {
               <input
                 type="text"
                 value={name}
+                disabled={loading}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Agent Alex Vance"
                 required
-                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
+                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -114,10 +139,11 @@ export const RegisterPage: React.FC = () => {
               <input
                 type="email"
                 value={email}
+                disabled={loading}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="investigator@agency.gov"
                 required
-                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
+                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -131,13 +157,15 @@ export const RegisterPage: React.FC = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
+                disabled={loading}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="w-full pl-11 pr-11 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
+                className="w-full pl-11 pr-11 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
               >
@@ -155,10 +183,11 @@ export const RegisterPage: React.FC = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={confirmPassword}
+                disabled={loading}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
+                className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#070e1e]/80 border border-slate-200/80 dark:border-sky-900/50 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -182,10 +211,13 @@ export const RegisterPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="astra-btn-primary w-full justify-center py-3 text-sm mt-2"
+            className="astra-btn-primary w-full justify-center py-3 text-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Creating Account...</span>
+              </div>
             ) : (
               <>
                 <span>Create Investigator Account</span>

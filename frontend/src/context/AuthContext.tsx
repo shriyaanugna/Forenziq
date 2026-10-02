@@ -67,6 +67,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
+        const errMsg = error.message || '';
+        if (error.status === 429 || errMsg.toLowerCase().includes('rate limit')) {
+          return { error: 'Too many sign-in attempts. Please wait a few minutes before trying again.' };
+        }
+        if (errMsg.toLowerCase().includes('invalid login credentials')) {
+          return { error: 'Invalid email address or password. Please check your credentials.' };
+        }
+        if (errMsg.toLowerCase().includes('email not confirmed')) {
+          return { error: 'Email address not confirmed. Please check your inbox for the confirmation link.' };
+        }
         return { error: error.message || 'Invalid email or password.' };
       }
 
@@ -99,6 +109,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        const errMsg = error.message || '';
+        const isRateLimit = error.status === 429 ||
+          errMsg.toLowerCase().includes('rate limit') ||
+          errMsg.toLowerCase().includes('too many requests') ||
+          errMsg.toLowerCase().includes('exceeded');
+
+        if (isRateLimit) {
+          return {
+            error: 'Email rate limit exceeded. Supabase limits sign-up confirmation emails on default settings. Please wait a few minutes before trying again, or log in if your account is already created.'
+          };
+        }
+
         return { error: error.message || 'Sign up failed.' };
       }
 
@@ -118,7 +140,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error: 'Unable to create user account.' };
     } catch (err: any) {
-      return { error: err.message || 'Registration failed.' };
+      const errMsg = err?.message || '';
+      if (err?.status === 429 || errMsg.toLowerCase().includes('rate limit')) {
+        return {
+          error: 'Email rate limit exceeded. Please wait a few minutes before trying again.'
+        };
+      }
+      return { error: errMsg || 'Registration failed.' };
     }
   };
 
