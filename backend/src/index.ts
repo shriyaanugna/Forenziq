@@ -27,6 +27,17 @@ app.use(cors({
 
 app.use(express.json());
 
+// Root API information endpoint
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'FORENZIQ API',
+    service: 'Automated Digital Forensics Reporter',
+    version: '1.0.0',
+    status: 'online',
+    health: '/api/health',
+  });
+});
+
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/cases', casesRouter);

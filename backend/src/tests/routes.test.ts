@@ -114,6 +114,14 @@ vi.mock('../utils/supabaseClient.js', () => {
 });
 
 describe('API Routes', () => {
+  it('GET / should return root API metadata', async () => {
+    const res = await request(app).get('/');
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe('FORENZIQ API');
+    expect(res.body.status).toBe('online');
+    expect(res.body.health).toBe('/api/health');
+  });
+
   it('GET /api/health should return ok', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);
