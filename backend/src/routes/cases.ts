@@ -59,13 +59,17 @@ router.post('/', optionalAuth, async (req: AuthenticatedRequest, res: Response, 
   }
 });
 
-// GET /api/cases - List all cases
-router.get('/', optionalAuth, async (_req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+// GET /api/cases - List cases for user (or all cases if unauthenticated / system level)
+router.get('/', optionalAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const { data: cases, error } = await supabase
-      .from('cases')
-      .select('*')
-      .order('created_at', { ascending: false });
+    let query = supabase.from('cases').select('*');
+
+    // Filter by investigator_id if user is authenticated (including unassigned legacy cases)
+    if (req.user?.id) {
+      query = query.or(`investigator_id.eq.${req.user.id},investigator_id.is.null`);
+    }
+
+    const { data: cases, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch cases: ${error.message}`);
@@ -96,6 +100,12 @@ router.get('/:caseId', optionalAuth, async (req: AuthenticatedRequest, res: Resp
 
     if (error || !caseItem) {
       res.status(404).json({ error: { message: `Case with ID '${caseIdParam}' not found.` } });
+      return;
+    }
+
+    // Verify access permission if case is owned by another investigator
+    if (req.user?.id && caseItem.investigator_id && caseItem.investigator_id !== req.user.id) {
+      res.status(403).json({ error: { message: 'Access denied. You do not have permission to view this forensic case.' } });
       return;
     }
 

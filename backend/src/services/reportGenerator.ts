@@ -12,7 +12,6 @@ export interface ReportData {
 export function generatePDFReport(data: ReportData): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
-      // Buffer pages for two-pass rendering (headers, footers, TOC page numbers)
       const doc = new PDFDocument({
         margin: 45,
         bufferPages: true,
@@ -32,15 +31,10 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
 
       const { caseItem, evidenceList, findingsList, correlationsList, auditLogs } = data;
 
-      // Safe character normalization for standard Helvetica font in PDFKit
+      // Safe character handling preserving raw Unicode text (including ₹, €, $, £, ¥)
       const safeText = (str: string | undefined | null) => {
         if (!str) return '';
-        return str
-          .replace(/₹/g, 'INR ')
-          .replace(/€/g, 'EUR ')
-          .replace(/£/g, 'GBP ')
-          .replace(/¥/g, 'JPY ')
-          .replace(/[^\x00-\x7F]/g, ''); // strip unsupported non-ASCII control symbols safely
+        return str;
       };
 
       const reportRefNumber = `RPT-${caseItem.case_id.replace(/^CASE-/, '')}-${Math.floor(Date.now() / 1000).toString(36).toUpperCase()}`;
@@ -72,12 +66,20 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
         severityLow: '#15803D',      // Dark Green
       };
 
+      // Helper to ensure sufficient space remains on page before rendering a component
+      const ensureSpace = (neededHeight: number) => {
+        if (doc.y + neededHeight > 750) {
+          doc.addPage();
+        }
+      };
+
       // Helper: Section Header
       const drawSectionHeader = (numberStr: string, titleStr: string) => {
+        ensureSpace(60);
         const fullTitle = `${numberStr}. ${titleStr}`;
         registerSection(fullTitle);
 
-        doc.moveDown(1);
+        doc.moveDown(0.8);
         const y = doc.y;
 
         // Navy blue line left accent
@@ -95,13 +97,12 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
            .lineTo(550, doc.y)
            .stroke();
 
-        doc.moveDown(1);
+        doc.moveDown(0.8);
       };
 
       // ==========================================
       // PAGE 1: FORMAL COVER PAGE
       // ==========================================
-      // Header Branding Box
       doc.rect(45, 45, 505, 70).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
       doc.fillColor(COLORS.navyDark).font('Helvetica-Bold').fontSize(22).text('FORENZIQ', 65, 60);
       doc.fillColor(COLORS.textMuted).font('Helvetica').fontSize(10).text('AUTOMATED DIGITAL FORENSICS REPORTER', 65, 88);
@@ -153,7 +154,7 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.text(`• Automated Report Engine: FORENZIQ Core v2.4`, 60, ctrlY + 110);
 
       // ==========================================
-      // PAGE 2: TABLE OF CONTENTS
+      // PAGE 2: TABLE OF CONTENTS (Placeholder space for Pass 2)
       // ==========================================
       doc.addPage();
       doc.fillColor(COLORS.navyDark).font('Helvetica-Bold').fontSize(18).text('TABLE OF CONTENTS', 45, 50);
@@ -161,8 +162,7 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.moveDown(2);
 
       const tocPlaceholderY = doc.y;
-      // Reserve space for TOC listing which will be populated in Pass 2
-      doc.y = tocPlaceholderY + 320;
+      doc.y = 700;
 
       // ==========================================
       // SECTION 1: EXECUTIVE SUMMARY
@@ -176,9 +176,10 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
         `and cross-correlate findings across all submitted digital evidence artifacts.`,
         { align: 'justify', lineGap: 3 }
       );
-      doc.moveDown(1.5);
+      doc.moveDown(1.2);
 
       // Executive Summary Metrics Table
+      ensureSpace(140);
       const execY = doc.y;
       doc.rect(45, execY, 505, 130).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
 
@@ -199,21 +200,24 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       drawExecRow(execY + 70, 'Critical / High Threats', `${criticalCount} Critical | ${highCount} High`, 'Correlated Entity Overlaps', `${correlationsList.length} Match(es)`);
 
       doc.y = execY + 145;
-      doc.moveDown(1);
 
       // ==========================================
       // SECTION 2: CASE OVERVIEW AND SCOPE
       // ==========================================
       drawSectionHeader('2', 'Case Overview and Scope');
 
+      ensureSpace(50);
       doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(10).text('Case Description & Context:');
+      doc.moveDown(0.3);
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
         safeText(caseItem.description) || 'No detailed case description was provided by the investigator at the time of creation.',
         { align: 'justify', lineGap: 2 }
       );
       doc.moveDown(1);
 
+      ensureSpace(100);
       doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(10).text('Scope of Automated Examination:');
+      doc.moveDown(0.3);
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
         '1. Cryptographic hashing (SHA-256) of all uploaded evidence artifacts to establish baseline digital integrity.\n' +
         '2. Multi-provider AI and Optical Character Recognition (OCR) text extraction from screenshots and darknet chat logs.\n' +
@@ -227,7 +231,6 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       // ==========================================
       // SECTION 3: EVIDENCE INVENTORY & SHA-256
       // ==========================================
-      doc.addPage();
       drawSectionHeader('3', 'Evidence Inventory & Cryptographic Verification');
 
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
@@ -238,11 +241,12 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.moveDown(1);
 
       if (evidenceList.length === 0) {
+        ensureSpace(30);
         doc.fillColor(COLORS.textMuted).font('Helvetica-Oblique').fontSize(9.5).text('No evidence items recorded for this case.');
+        doc.moveDown(1);
       } else {
         evidenceList.forEach((ev, idx) => {
-          const evBoxY = doc.y;
-          if (evBoxY > 650) doc.addPage();
+          ensureSpace(110);
 
           const startY = doc.y;
           doc.rect(45, startY, 505, 95).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
@@ -265,12 +269,14 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
 
           doc.y = startY + 105;
 
-          // Evidence Content Snippet if available
+          // Evidence Content Snippet if available (dynamic flow)
           if (ev.metadata?.pasted_text || ev.metadata?.ocr_text) {
+            ensureSpace(50);
             const rawTxt = safeText(ev.metadata.pasted_text || ev.metadata.ocr_text);
-            doc.fillColor(COLORS.textMuted).font('Helvetica-Bold').fontSize(8).text('EXTRACTED EVIDENCE CONTENT SNIPPET:', 55, doc.y);
+            doc.fillColor(COLORS.textMuted).font('Helvetica-Bold').fontSize(8).text('EXTRACTED EVIDENCE CONTENT SNIPPET:');
+            doc.moveDown(0.2);
             doc.fillColor(COLORS.textDark).font('Courier').fontSize(7.5).text(
-              rawTxt.length > 300 ? `${rawTxt.slice(0, 300)}... [TRUNCATED]` : rawTxt,
+              rawTxt.length > 400 ? `${rawTxt.slice(0, 400)}... [TRUNCATED]` : rawTxt,
               { width: 495, align: 'left', lineGap: 2 }
             );
             doc.moveDown(1);
@@ -283,7 +289,6 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       // ==========================================
       // SECTION 4: METHODOLOGY & EXAMINATION PROCESS
       // ==========================================
-      doc.addPage();
       drawSectionHeader('4', 'Methodology & Technical Examination Process');
 
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
@@ -294,9 +299,7 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.moveDown(1);
 
       const drawMethodStep = (stepNum: string, title: string, desc: string) => {
-        const sY = doc.y;
-        if (sY > 680) doc.addPage();
-
+        ensureSpace(55);
         doc.circle(60, doc.y + 6, 10).fill(COLORS.navyDark);
         doc.fillColor(COLORS.white).font('Helvetica-Bold').fontSize(9).text(stepNum, 56, doc.y + 2);
 
@@ -314,7 +317,6 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       // ==========================================
       // SECTION 5: DETAILED FORENSIC FINDINGS
       // ==========================================
-      doc.addPage();
       drawSectionHeader('5', 'Detailed Forensic Findings');
 
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
@@ -325,10 +327,12 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.moveDown(1);
 
       if (findingsList.length === 0) {
+        ensureSpace(30);
         doc.fillColor(COLORS.textMuted).font('Helvetica-Oblique').fontSize(9.5).text('No forensic findings recorded for this case.');
+        doc.moveDown(1);
       } else {
         findingsList.forEach((fnd, idx) => {
-          if (doc.y > 600) doc.addPage();
+          ensureSpace(120);
 
           const fndY = doc.y;
           doc.rect(45, fndY, 505, 25).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
@@ -350,31 +354,40 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
 
           doc.y = fndY + 30;
 
-          // Finding Details Table
+          // Finding Details
           doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(8.5);
           doc.text(`• Associated Evidence ID: ${fnd.evidence_id || 'Case-wide'}`, 55, doc.y);
           doc.text(`• AI Suggested Severity: ${fnd.ai_suggested_severity || 'N/A'}`, 250, doc.y);
           doc.text(`• Confidence Score: ${(fnd.confidence * 100).toFixed(0)}%`, 420, doc.y);
-          doc.moveDown(0.5);
+          doc.moveDown(0.6);
 
-          doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(8.5).text('Description:', 55, doc.y);
-          doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(8.5).text(safeText(fnd.description), 55, doc.y + 11, { width: 485, align: 'justify', lineGap: 2 });
-          doc.moveDown(0.8);
+          doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(8.5).text('Description:');
+          doc.moveDown(0.2);
+          doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(8.5).text(
+            safeText(fnd.description), { width: 485, align: 'justify', lineGap: 2 }
+          );
+          doc.moveDown(0.6);
 
           if (fnd.reasoning) {
-            doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(8.5).text('Reasoning & Deterministic Evaluation:', 55, doc.y);
-            doc.fillColor(COLORS.textDark).font('Helvetica-Oblique').fontSize(8.5).text(safeText(fnd.reasoning), 55, doc.y + 11, { width: 485, align: 'justify', lineGap: 2 });
-            doc.moveDown(0.8);
+            ensureSpace(40);
+            doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(8.5).text('Reasoning & Deterministic Evaluation:');
+            doc.moveDown(0.2);
+            doc.fillColor(COLORS.textDark).font('Helvetica-Oblique').fontSize(8.5).text(
+              safeText(fnd.reasoning), { width: 485, align: 'justify', lineGap: 2 }
+            );
+            doc.moveDown(0.6);
           }
 
           // Extracted Entities Pill Display if present
           if (fnd.entities && Object.keys(fnd.entities).length > 0) {
-            doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(8.5).text('Extracted Technical Entities:', 55, doc.y);
+            ensureSpace(40);
+            doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(8.5).text('Extracted Technical Entities:');
+            doc.moveDown(0.2);
             const entStr = Object.entries(fnd.entities)
               .map(([k, v]) => `${k.toUpperCase()}: ${Array.isArray(v) ? v.join(', ') : v}`)
               .join(' | ');
-            doc.fillColor(COLORS.accentBlue).font('Courier').fontSize(8).text(entStr, 55, doc.y + 11, { width: 485 });
-            doc.moveDown(0.8);
+            doc.fillColor(COLORS.accentBlue).font('Courier').fontSize(8).text(entStr, { width: 485, lineGap: 2 });
+            doc.moveDown(0.6);
           }
 
           doc.strokeColor(COLORS.border).lineWidth(1).moveTo(45, doc.y).lineTo(550, doc.y).stroke();
@@ -385,7 +398,6 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       // ==========================================
       // SECTION 6: CROSS-EVIDENCE CORRELATION
       // ==========================================
-      doc.addPage();
       drawSectionHeader('6', 'Cross-Evidence Correlation Analysis');
 
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
@@ -396,15 +408,17 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.moveDown(1);
 
       if (correlationsList.length === 0) {
+        ensureSpace(45);
         const noCorY = doc.y;
         doc.rect(45, noCorY, 505, 45).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
         doc.fillColor(COLORS.textMuted).font('Helvetica-Oblique').fontSize(9.5).text(
           'No cross-evidence correlations were identified by the current analysis.', 60, noCorY + 16
         );
         doc.y = noCorY + 55;
+        doc.moveDown(1);
       } else {
         correlationsList.forEach((crl, idx) => {
-          if (doc.y > 660) doc.addPage();
+          ensureSpace(75);
 
           const crlY = doc.y;
           doc.rect(45, crlY, 505, 65).fillAndStroke(COLORS.tableBgHeader, COLORS.border);
@@ -428,7 +442,6 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       // ==========================================
       // SECTION 7: CHAIN OF CUSTODY & AUDIT TRAIL
       // ==========================================
-      doc.addPage();
       drawSectionHeader('7', 'Chain of Custody & Audit Trail');
 
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
@@ -439,29 +452,27 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       doc.moveDown(1);
 
       if (auditLogs.length === 0) {
+        ensureSpace(30);
         doc.fillColor(COLORS.textMuted).font('Helvetica-Oblique').fontSize(9.5).text('No audit events logged.');
+        doc.moveDown(1);
       } else {
-        // Table Header
-        const thY = doc.y;
-        doc.rect(45, thY, 505, 20).fillAndStroke(COLORS.navyDark, COLORS.navyDark);
-        doc.fillColor(COLORS.white).font('Helvetica-Bold').fontSize(8.5);
-        doc.text('TIMESTAMP (UTC)', 55, thY + 6);
-        doc.text('EVENT TYPE', 180, thY + 6);
-        doc.text('DESCRIPTION / ACTION', 310, thY + 6);
+        const drawAuditHeader = () => {
+          const thY = doc.y;
+          doc.rect(45, thY, 505, 20).fillAndStroke(COLORS.navyDark, COLORS.navyDark);
+          doc.fillColor(COLORS.white).font('Helvetica-Bold').fontSize(8.5);
+          doc.text('TIMESTAMP (UTC)', 55, thY + 6);
+          doc.text('EVENT TYPE', 180, thY + 6);
+          doc.text('DESCRIPTION / ACTION', 310, thY + 6);
+          doc.y = thY + 22;
+        };
 
-        doc.y = thY + 22;
+        ensureSpace(45);
+        drawAuditHeader();
 
         auditLogs.forEach((log, lIdx) => {
-          if (doc.y > 680) {
+          if (doc.y + 25 > 750) {
             doc.addPage();
-            // Re-render header on new page
-            const rThY = doc.y;
-            doc.rect(45, rThY, 505, 20).fillAndStroke(COLORS.navyDark, COLORS.navyDark);
-            doc.fillColor(COLORS.white).font('Helvetica-Bold').fontSize(8.5);
-            doc.text('TIMESTAMP (UTC)', 55, rThY + 6);
-            doc.text('EVENT TYPE', 180, rThY + 6);
-            doc.text('DESCRIPTION / ACTION', 310, rThY + 6);
-            doc.y = rThY + 22;
+            drawAuditHeader();
           }
 
           const rowY = doc.y;
@@ -476,15 +487,17 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
 
           doc.y = rowY + 22;
         });
+        doc.moveDown(1);
       }
 
       // ==========================================
       // SECTION 8: CONCLUSION AND LIMITATIONS
       // ==========================================
-      doc.addPage();
       drawSectionHeader('8', 'Conclusion & Forensic Limitations');
 
+      ensureSpace(60);
       doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(10).text('Summary of Findings:');
+      doc.moveDown(0.3);
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(9).text(
         `The automated forensic examination of Case ${caseItem.case_id} successfully ingested ${evidenceList.length} evidence file(s), ` +
         `generated ${findingsList.length} threat finding(s), and established ${correlationsList.length} entity correlation link(s). ` +
@@ -493,7 +506,9 @@ export function generatePDFReport(data: ReportData): Promise<Buffer> {
       );
       doc.moveDown(1.5);
 
+      ensureSpace(110);
       doc.fillColor(COLORS.navyMedium).font('Helvetica-Bold').fontSize(10).text('Important Forensic Limitations & Disclaimers:');
+      doc.moveDown(0.3);
       doc.fillColor(COLORS.textDark).font('Helvetica').fontSize(8.5).text(
         '1. AI-Assisted Interpretations: Machine learning and AI vision models provide automated entity extraction and risk suggestions. ' +
         'All AI-generated reasoning should be validated by a certified digital forensics examiner prior to formal legal submission.\n' +

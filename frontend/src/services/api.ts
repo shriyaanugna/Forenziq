@@ -1,9 +1,20 @@
 import { Case, Evidence, Finding, DashboardStats, Correlation, AuditLog, Report } from '../types';
+import { supabase } from '../lib/supabase';
 
 const API_BASE = '/api';
 
+async function getAuthHeaders(customHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: Record<string, string> = { ...customHeaders };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
+  return headers;
+}
+
 export async function fetchDashboardStats(): Promise<DashboardStats> {
-  const res = await fetch(`${API_BASE}/dashboard/stats`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/stats`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch dashboard metrics');
@@ -13,7 +24,8 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
 }
 
 export async function fetchCases(): Promise<Case[]> {
-  const res = await fetch(`${API_BASE}/cases`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch cases');
@@ -23,7 +35,8 @@ export async function fetchCases(): Promise<Case[]> {
 }
 
 export async function fetchCase(caseId: string): Promise<Case> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch case details');
@@ -33,9 +46,10 @@ export async function fetchCase(caseId: string): Promise<Case> {
 }
 
 export async function createCase(payload: { title: string; description: string; investigator_name?: string }): Promise<Case> {
+  const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
   const res = await fetch(`${API_BASE}/cases`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -47,7 +61,8 @@ export async function createCase(payload: { title: string; description: string; 
 }
 
 export async function fetchCaseEvidence(caseId: string): Promise<Evidence[]> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/evidence`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/evidence`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch evidence');
@@ -57,8 +72,10 @@ export async function fetchCaseEvidence(caseId: string): Promise<Evidence[]> {
 }
 
 export async function uploadEvidence(caseId: string, formData: FormData): Promise<Evidence> {
+  const headers = await getAuthHeaders();
   const res = await fetch(`${API_BASE}/cases/${caseId}/evidence`, {
     method: 'POST',
+    headers,
     body: formData,
   });
   if (!res.ok) {
@@ -70,8 +87,10 @@ export async function uploadEvidence(caseId: string, formData: FormData): Promis
 }
 
 export async function analyzeEvidence(evidenceId: string): Promise<{ finding: Finding; evidence_status: string }> {
+  const headers = await getAuthHeaders();
   const res = await fetch(`${API_BASE}/evidence/${evidenceId}/analyze`, {
     method: 'POST',
+    headers,
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -82,7 +101,8 @@ export async function analyzeEvidence(evidenceId: string): Promise<{ finding: Fi
 }
 
 export async function fetchCaseFindings(caseId: string): Promise<Finding[]> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/findings`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/findings`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch findings');
@@ -93,7 +113,8 @@ export async function fetchCaseFindings(caseId: string): Promise<Finding[]> {
 
 // Phase 2 API helpers
 export async function triggerCorrelationScan(caseId: string): Promise<Correlation[]> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/correlations`, { method: 'POST' });
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/correlations`, { method: 'POST', headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to trigger correlation scan');
@@ -103,7 +124,8 @@ export async function triggerCorrelationScan(caseId: string): Promise<Correlatio
 }
 
 export async function fetchCaseCorrelations(caseId: string): Promise<Correlation[]> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/correlations`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/correlations`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch correlations');
@@ -113,7 +135,8 @@ export async function fetchCaseCorrelations(caseId: string): Promise<Correlation
 }
 
 export async function fetchCaseAuditTrail(caseId: string): Promise<AuditLog[]> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/audit`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/audit`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch audit trail');
@@ -123,7 +146,8 @@ export async function fetchCaseAuditTrail(caseId: string): Promise<AuditLog[]> {
 }
 
 export async function generateReport(caseId: string): Promise<Report> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/reports`, { method: 'POST' });
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/reports`, { method: 'POST', headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to generate report');
@@ -133,7 +157,8 @@ export async function generateReport(caseId: string): Promise<Report> {
 }
 
 export async function fetchCaseReports(caseId: string): Promise<Report[]> {
-  const res = await fetch(`${API_BASE}/cases/${caseId}/reports`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/cases/${caseId}/reports`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch case reports');
@@ -143,7 +168,8 @@ export async function fetchCaseReports(caseId: string): Promise<Report[]> {
 }
 
 export async function fetchAllReports(): Promise<Report[]> {
-  const res = await fetch(`${API_BASE}/reports`);
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/reports`, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to list reports');
