@@ -34,76 +34,76 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#06090e] flex flex-col justify-center items-center px-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#06090e] text-slate-900 dark:text-slate-100 flex flex-col justify-center items-center px-4 relative overflow-hidden font-sans transition-colors">
       {/* Subtle Background Radial Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-950/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 dark:bg-cyan-950/20 rounded-full blur-3xl pointer-events-none" />
 
       {/* Brand Header */}
       <div className="mb-8 text-center relative z-10">
         <Link to="/" className="inline-flex items-center gap-2 mb-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 p-[1px] flex items-center justify-center shadow-lg shadow-cyan-950/50">
-            <div className="w-full h-full bg-[#0d121c] rounded-[11px] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-cyan-400" />
+          <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-gradient-to-tr dark:from-cyan-600 dark:to-blue-600 p-[1px] flex items-center justify-center shadow-lg">
+            <div className="w-full h-full bg-slate-900 dark:bg-[#0d121c] rounded-[11px] flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white dark:text-cyan-400" />
             </div>
           </div>
-          <span className="text-2xl font-extrabold tracking-tight text-white">
-            FOREN<span className="text-cyan-400">ZIQ</span>
+          <span className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            FOREN<span className="text-blue-600 dark:text-cyan-400">ZIQ</span>
           </span>
         </Link>
-        <h1 className="text-xl font-bold text-slate-100 tracking-tight">Welcome back</h1>
-        <p className="text-sm text-slate-400 mt-1">Sign in to continue your digital forensic investigations.</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Welcome back</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Sign in to continue your digital forensic investigations.</p>
       </div>
 
       {/* Login Card */}
-      <div className="w-full max-w-md bg-[#0d121c]/90 border border-slate-800/80 rounded-2xl p-8 shadow-2xl backdrop-blur-xl relative z-10">
+      <div className="w-full max-w-md bg-white/80 dark:bg-[#0d121c]/90 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-8 shadow-2xl backdrop-blur-xl relative z-10">
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-300 text-xs flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="investigator@agency.gov"
                 required
-                className="w-full bg-[#06090e] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full bg-slate-50 dark:bg-[#06090e] border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-cyan-500 transition-colors"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Password
               </label>
-              <a href="#reset" onClick={(e) => { e.preventDefault(); alert('Password reset requested. Check your email instructions.'); }} className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
+              <a href="#reset" onClick={(e) => { e.preventDefault(); alert('Password reset requested. Check your email instructions.'); }} className="text-xs text-blue-600 dark:text-cyan-400 hover:text-blue-500 dark:hover:text-cyan-300 transition-colors">
                 Forgot password?
               </a>
             </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="w-full bg-[#06090e] border border-slate-800 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="w-full bg-slate-50 dark:bg-[#06090e] border border-slate-200 dark:border-slate-800 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-cyan-500 transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -113,10 +113,10 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold py-3.5 px-4 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-cyan-950/50 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-gradient-to-r dark:from-cyan-500 dark:to-blue-600 dark:hover:from-cyan-400 dark:hover:to-blue-500 text-white dark:text-slate-950 font-bold py-3.5 px-4 rounded-xl text-sm transition-all duration-200 shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-white dark:border-slate-950 border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
                 <span>Sign In</span>
@@ -126,9 +126,9 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-xs text-slate-400 border-t border-slate-800/60 pt-6">
+        <div className="mt-8 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-800/60 pt-6">
           Don't have an investigator account?{' '}
-          <Link to="/register" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+          <Link to="/register" className="text-blue-600 dark:text-cyan-400 hover:text-blue-500 dark:hover:text-cyan-300 font-semibold transition-colors">
             Create an Account
           </Link>
         </div>
