@@ -86,3 +86,42 @@ export interface DashboardStats {
   recent_findings: Finding[];
   configured_ai_providers: string[];
 }
+
+export interface Correlation {
+  id: string;
+  correlation_id: string;
+  case_id: string;
+  source_evidence_id: string;
+  target_evidence_id: string;
+  source_finding_id?: string | null;
+  target_finding_id?: string | null;
+  matched_entity_type: string;
+  matched_entity_value: string;
+  correlation_type: string;
+  confidence: number;
+  reason: string;
+  created_at: string;
+}
+
+export interface AuditLog {
+  id: string;
+  event_id: string;
+  case_id: string;
+  evidence_id?: string | null;
+  actor_user_id?: string | null;
+  event_type: string;
+  description: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+}
+
+export interface Report {
+  id: string;
+  report_id: string;
+  case_id: string;
+  file_name: string;
+  storage_path: string;
+  status: 'GENERATED' | 'ARCHIVED';
+  metadata?: Record<string, any>;
+  created_at: string;
+}

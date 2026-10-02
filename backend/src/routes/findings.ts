@@ -4,10 +4,13 @@ import { AIService } from '../services/ai/AIService.js';
 import { OCRService } from '../services/ocrService.js';
 import { evaluateSeverity } from '../services/severityEngine.js';
 import { generateFindingId } from '../utils/idGenerator.js';
+import { AuditService } from '../services/auditService.js';
+import { CorrelationEngine } from '../services/correlationEngine.js';
 
 const router = Router();
 const aiService = new AIService();
 const ocrService = new OCRService();
+const correlationEngine = new CorrelationEngine(aiService);
 
 // POST /api/evidence/:evidenceId/analyze - Trigger real AI/OCR analysis
 router.post('/evidence/:evidenceId/analyze', async (req: Request, res: Response, next: NextFunction) => {
@@ -109,12 +112,36 @@ router.post('/evidence/:evidenceId/analyze', async (req: Request, res: Response,
         .select()
         .single();
 
-      if (fndDbError) {
-        throw new Error(`Failed to insert finding into database: ${fndDbError.message}`);
+      if (fndDbError || !newFinding) {
+        throw new Error(`Failed to insert finding into database: ${fndDbError?.message}`);
       }
 
       // Update evidence status to COMPLETED
       await supabase.from('evidence').update({ analysis_status: 'COMPLETED' }).eq('id', evidence.id);
+
+      // Log chain-of-custody audit logs
+      await AuditService.logEvent({
+        caseId: evidence.case_id,
+        evidenceId: evidence.id,
+        eventType: 'EVIDENCE_ANALYZED',
+        description: `AI analysis completed for evidence ${evidence.evidence_id}. Provider: ${aiResult.raw_provider || 'AI Engine'}.`,
+        metadata: { evidence_id: evidence.evidence_id, provider: aiResult.raw_provider },
+      });
+
+      await AuditService.logEvent({
+        caseId: evidence.case_id,
+        evidenceId: evidence.id,
+        eventType: 'FINDING_CREATED',
+        description: `Finding ${findingIdStr} '${newFinding.title}' (${newFinding.severity}) generated for evidence ${evidence.evidence_id}.`,
+        metadata: { finding_id: findingIdStr, severity: newFinding.severity },
+      });
+
+      // Automatically trigger cross-evidence correlation scan for case
+      try {
+        await correlationEngine.correlateCase(evidence.case_id);
+      } catch (corrErr: any) {
+        console.warn('Automatic correlation scan notice:', corrErr.message);
+      }
 
       res.status(200).json({
         data: {

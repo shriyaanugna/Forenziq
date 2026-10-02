@@ -2,14 +2,29 @@ import { describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
 import { app } from '../index.js';
 
-// Mock supabase client calls to avoid external network requirements during route tests
+// Mock supabase client calls
 vi.mock('../utils/supabaseClient.js', () => {
   return {
     supabase: {
       from: vi.fn((table: string) => {
         if (table === 'cases') {
           return {
-            insert: vi.fn().mockReturnThis(),
+            insert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: '11111111-1111-1111-1111-111111111111',
+                    case_id: 'CASE-12345678',
+                    title: 'Test Case',
+                    description: 'Test Description',
+                    status: 'OPEN',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  },
+                  error: null,
+                }),
+              }),
+            }),
             select: vi.fn().mockReturnThis(),
             order: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -30,7 +45,26 @@ vi.mock('../utils/supabaseClient.js', () => {
         if (table === 'evidence') {
           return {
             select: vi.fn().mockReturnThis(),
-            insert: vi.fn().mockReturnThis(),
+            insert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: '22222222-2222-2222-2222-222222222222',
+                    evidence_id: 'CHAT-12345678',
+                    case_id: '11111111-1111-1111-1111-111111111111',
+                    type: 'CHAT',
+                    file_name: 'chat.txt',
+                    file_path: 'CASE-12345678/CHAT-12345678_chat.txt',
+                    file_size: 100,
+                    mime_type: 'text/plain',
+                    sha256_hash: 'a'.repeat(64),
+                    uploaded_at: new Date().toISOString(),
+                    analysis_status: 'PENDING',
+                  },
+                  error: null,
+                }),
+              }),
+            }),
             update: vi.fn().mockReturnThis(),
             order: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -52,11 +86,19 @@ vi.mock('../utils/supabaseClient.js', () => {
             }),
           };
         }
-        if (table === 'findings') {
+        if (table === 'audit_logs' || table === 'correlations' || table === 'reports' || table === 'findings') {
           return {
-            select: vi.fn().mockReturnThis(),
-            order: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
+            insert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: { id: 'uuid-1' }, error: null }),
+              }),
+            }),
+            select: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+              }),
+              eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+            }),
           };
         }
         return {};

@@ -1,4 +1,4 @@
-import { Case, Evidence, Finding, DashboardStats } from '../types';
+import { Case, Evidence, Finding, DashboardStats, Correlation, AuditLog, Report } from '../types';
 
 const API_BASE = '/api';
 
@@ -86,6 +86,67 @@ export async function fetchCaseFindings(caseId: string): Promise<Finding[]> {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error?.message || 'Failed to fetch findings');
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+// Phase 2 API helpers
+export async function triggerCorrelationScan(caseId: string): Promise<Correlation[]> {
+  const res = await fetch(`${API_BASE}/cases/${caseId}/correlations`, { method: 'POST' });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to trigger correlation scan');
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function fetchCaseCorrelations(caseId: string): Promise<Correlation[]> {
+  const res = await fetch(`${API_BASE}/cases/${caseId}/correlations`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to fetch correlations');
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function fetchCaseAuditTrail(caseId: string): Promise<AuditLog[]> {
+  const res = await fetch(`${API_BASE}/cases/${caseId}/audit`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to fetch audit trail');
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function generateReport(caseId: string): Promise<Report> {
+  const res = await fetch(`${API_BASE}/cases/${caseId}/reports`, { method: 'POST' });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to generate report');
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function fetchCaseReports(caseId: string): Promise<Report[]> {
+  const res = await fetch(`${API_BASE}/cases/${caseId}/reports`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to fetch case reports');
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function fetchAllReports(): Promise<Report[]> {
+  const res = await fetch(`${API_BASE}/reports`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Failed to list reports');
   }
   const json = await res.json();
   return json.data;

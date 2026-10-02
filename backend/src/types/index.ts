@@ -69,7 +69,7 @@ export interface Finding {
   title: string;
   description: string;
   severity: SeverityLevel;
-  confidence: number; // 0.0 to 1.0
+  confidence: number;
   reasoning: string;
   entities: ExtractedEntities;
   indicators: SuspiciousIndicator[];
@@ -88,4 +88,54 @@ export interface AIAnalysisResult {
   entities: ExtractedEntities;
   indicators: SuspiciousIndicator[];
   raw_provider?: string;
+}
+
+export type AuditEventType =
+  | 'CASE_CREATED'
+  | 'EVIDENCE_UPLOADED'
+  | 'EVIDENCE_ANALYZED'
+  | 'FINDING_CREATED'
+  | 'CORRELATION_CREATED'
+  | 'REPORT_GENERATED'
+  | 'REPORT_VIEWED'
+  | 'REPORT_DOWNLOADED';
+
+export interface AuditLog {
+  id: string;
+  event_id: string;
+  case_id: string;
+  evidence_id?: string | null;
+  actor_user_id?: string | null;
+  event_type: AuditEventType;
+  description: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+}
+
+export interface Correlation {
+  id: string;
+  correlation_id: string;
+  case_id: string;
+  source_evidence_id: string;
+  target_evidence_id: string;
+  source_finding_id?: string | null;
+  target_finding_id?: string | null;
+  matched_entity_type: string;
+  matched_entity_value: string;
+  correlation_type: string;
+  confidence: number;
+  reason: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+}
+
+export interface Report {
+  id: string;
+  report_id: string;
+  case_id: string;
+  file_name: string;
+  storage_path: string;
+  status: 'GENERATED' | 'ARCHIVED';
+  metadata?: Record<string, any>;
+  created_at: string;
 }

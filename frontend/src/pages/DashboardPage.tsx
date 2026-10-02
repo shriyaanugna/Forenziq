@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchDashboardStats } from '../services/api';
-import { DashboardStats } from '../types';
+import { DashboardStats, Case, Finding } from '../types';
 import {
   FolderLock,
   FileCheck2,
@@ -149,7 +149,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {recent_cases.map((c) => (
+              {recent_cases.map((c: Case) => (
                 <Link
                   key={c.id}
                   to={`/cases/${c.case_id}`}
@@ -182,7 +182,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {recent_findings.map((f) => (
+              {recent_findings.map((f: Finding) => (
                 <div key={f.id} className="p-4 rounded-lg bg-slate-950 border border-slate-800">
                   <div className="flex items-center justify-between">
                     <span

@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { supabase } from '../utils/supabaseClient.js';
 import { generateCaseId } from '../utils/idGenerator.js';
+import { AuditService } from '../services/auditService.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -36,9 +37,17 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       .select()
       .single();
 
-    if (error) {
-      throw new Error(`Failed to create case in database: ${error.message}`);
+    if (error || !newCase) {
+      throw new Error(`Failed to create case in database: ${error?.message}`);
     }
+
+    // Log chain-of-custody audit event
+    await AuditService.logEvent({
+      caseId: newCase.id,
+      eventType: 'CASE_CREATED',
+      description: `Forensic case ${caseIdString} '${title}' initialized by ${investigator_name}.`,
+      metadata: { case_id: caseIdString, investigator: investigator_name },
+    });
 
     res.status(201).json({ data: newCase });
   } catch (err) {

@@ -16,3 +16,15 @@ export function generateEvidenceId(type: 'IMAGE' | 'CHAT' | 'TEXT'): string {
 export function generateFindingId(): string {
   return `FND-${generateRandomHex(8)}`;
 }
+
+export function generateCorrelationId(): string {
+  return `CRL-${generateRandomHex(8)}`;
+}
+
+export function generateAuditEventId(): string {
+  return `AUD-${generateRandomHex(8)}`;
+}
+
+export function generateReportId(): string {
+  return `RPT-${generateRandomHex(8)}`;
+}

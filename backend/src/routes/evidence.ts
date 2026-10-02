@@ -3,6 +3,7 @@ import { supabase } from '../utils/supabaseClient.js';
 import { generateEvidenceId } from '../utils/idGenerator.js';
 import { calculateSHA256 } from '../utils/hashUtils.js';
 import { uploadMiddleware } from '../middleware/uploadMiddleware.js';
+import { AuditService } from '../services/auditService.js';
 
 const router = Router();
 
@@ -121,9 +122,18 @@ router.post('/:caseId/evidence', uploadMiddleware.single('file'), async (req: Re
       .select()
       .single();
 
-    if (dbError) {
-      throw new Error(`Failed to persist evidence record: ${dbError.message}`);
+    if (dbError || !newEvidence) {
+      throw new Error(`Failed to persist evidence record: ${dbError?.message}`);
     }
+
+    // Log chain-of-custody audit event
+    await AuditService.logEvent({
+      caseId: caseRecord.id,
+      evidenceId: newEvidence.id,
+      eventType: 'EVIDENCE_UPLOADED',
+      description: `Evidence ${evidenceIdStr} (${fileName}) uploaded to case ${caseRecord.case_id}. SHA-256: ${sha256Hash.slice(0, 16)}...`,
+      metadata: { evidence_id: evidenceIdStr, file_name: fileName, sha256: sha256Hash },
+    });
 
     res.status(201).json({ data: newEvidence });
   } catch (err) {
